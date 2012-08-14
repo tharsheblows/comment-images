@@ -3,7 +3,7 @@
 Plugin Name: Comment Images
 Plugin URI: http://tommcfarlin.com/comment-images
 Description: Allow your readers easily to attach an image to their comment.
-Version: 1.1
+Version: 1.2
 Author: Tom McFarlin
 Author URI: http://tommcfarlin.com
 Author Email: tom@tommcfarlin.com
@@ -27,7 +27,7 @@ License:
 
 // TODO 
 // - Next update show image preview in the admin of the image
-// - 
+// - JetPack compatibility
 
 class Comment_Image {
 
@@ -45,13 +45,18 @@ class Comment_Image {
 		// Determine if the hosting environment can save files.
 		if( $this->can_save_files() ) {
 	
+			// We need to update all of the comments thus far
+			if( false == get_option( 'update_comment_images' ) || null == get_option( 'update_comment_images' ) ) {
+				$this->update_old_comments();
+			} // end if
+	
 			// Add comment related stylesheets, scripts, form manipulation, and image serialization
 			add_action( 'wp_enqueue_scripts', array( &$this, 'add_styles' ) );
 			add_action( 'wp_enqueue_scripts', array( &$this, 'add_scripts' ) );
 			add_action( 'comment_form' , array( &$this, 'add_image_upload_form' ) );
 			add_filter( 'wp_insert_comment', array( &$this, 'save_comment_image' ) );
-			add_filter( 'comment_text', array( &$this, 'display_comment_image' ) );
-		
+			add_filter( 'comments_array', array( &$this, 'display_comment_image' ) );
+			
 		// If not, display a notice.	
 		} else {
 		
@@ -64,6 +69,44 @@ class Comment_Image {
 	/*--------------------------------------------*
 	 * Core Functions
 	 *---------------------------------------------*/
+	 
+	 /**
+	  * In previous versions of the plugin, the image were written out after the comments. Now,
+	  * they are actually part of the comment content so we need to update all old options.
+	  *
+	  * Note that this option is not removed on deactivation because it will run *again* if the
+	  * user ever re-activates it this duplicating the image.
+	  */
+	 private function update_old_comments() {
+		 
+		// Update the option that this has not run
+		update_option( 'update_comment_images', false );
+		
+		// Iterate through each of the comments...
+ 		foreach( get_comments() as $comment ) {
+ 		
+			// If the comment image meta value exists...
+			if( true == get_comment_meta( $comment->comment_ID, 'comment_image' ) ) {
+			
+				// Get the associated comment image
+				$comment_image = get_comment_meta( $comment->comment_ID, 'comment_image', true );
+				
+				// Append the image to the comment content
+				$comment->comment_content .= '<p class="comment-image">';
+					$comment->comment_content .= '<img src="' . $comment_image['url'] . '" alt="" />';
+				$comment->comment_content .= '</p><!-- /.comment-image -->';
+				
+				// Now we need to actually update the comment
+				wp_update_comment( (array)$comment );
+				
+			} // end if
+ 		
+		} // end if
+		
+		// Update the fact that this has run so we don't run it again
+		update_option( 'update_comment_images', true );
+		 
+	 } // end update_old_comments
 	 
 	 /**
 	  * Display a WordPress error to the administrator if the hosting environment does not support 'file_get_contents.'
@@ -174,22 +217,25 @@ class Comment_Image {
 	 *
 	 * @params	$comment	The content of the comment.
 	 */
-	function display_comment_image( $comment ) {
+	function display_comment_image( $comments ) {
 		
+		// Get the most recent comment
+		$comment = $comments[ count( $comments ) - 1 ];
+
 		// If the comment image meta value exists, then render the comment image
-		if( false != get_comment_meta( get_comment_ID(), 'comment_image' ) ) {
+		if( false != get_comment_meta( $comment->comment_ID, 'comment_image' ) ) {
 		
 			// Get the comment image meta
-			$comment_image = get_comment_meta( get_comment_ID(), 'comment_image', true );
+			$comment_image = get_comment_meta( $comment->comment_ID, 'comment_image', true );
 			
 			// Render it in a paragraph element appended to the comment
-			$comment .= '<p class="comment-image">';
-				$comment .= '<img src="' . $comment_image['url'] . '" alt="" />';
-			$comment .= '</p><!-- /.comment-image -->';	
+			$comment->comment_content .= '<p class="comment-image">';
+				$comment->comment_content .= '<img src="' . $comment_image['url'] . '" alt="" />';
+			$comment->comment_content .= '</p><!-- /.comment-image -->';	
 			
 		} // end if
 		
-		return $comment;
+		return $comments;
 		
 	} // end display_comment_image
 	
