@@ -4,7 +4,7 @@ Donate link: http://tommcfarlin.com/donate
 Tags: comments, image
 Requires at least: 3.4.1
 Tested up to: 3.4.1
-Stable tag: 1.0
+Stable tag: 1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ Same as above :)
 4. The administrator's dashboard notice when their hosting environment doesn't allow uploads
 
 == Changelog ==
+
+= 1.1 =
+* Updating README to show the screenshots.
 
 = 1.0 =
 * Initial release
