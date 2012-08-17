@@ -3,7 +3,7 @@
 Plugin Name: Comment Images
 Plugin URI: http://tommcfarlin.com/comment-images
 Description: Allow your readers easily to attach an image to their comment.
-Version: 1.2
+Version: 1.3
 Author: Tom McFarlin
 Author URI: http://tommcfarlin.com
 Author Email: tom@tommcfarlin.com
@@ -128,7 +128,7 @@ class Comment_Image {
 	  */
 	 function add_styles() {
 	
-		if( is_single() ) {
+		if( is_single() || is_page() ) {
 			
 			wp_register_style( 'comment-images', plugins_url( '/comment-images/css/plugin.css' ) );
 			wp_enqueue_style( 'comment-images' );
@@ -142,7 +142,7 @@ class Comment_Image {
 	 */ 
 	function add_scripts() {
 	
-		if( is_single() ) {
+		if( is_single() || is_page() ) {
 			
 			wp_register_script( 'comment-images', plugins_url( '/comment-images/js/plugin.min.js' ), array( 'jquery' ) );
 			wp_enqueue_script( 'comment-images' );
@@ -220,19 +220,23 @@ class Comment_Image {
 	function display_comment_image( $comments ) {
 		
 		// Get the most recent comment
-		$comment = $comments[ count( $comments ) - 1 ];
-
-		// If the comment image meta value exists, then render the comment image
-		if( false != get_comment_meta( $comment->comment_ID, 'comment_image' ) ) {
+		if( count( $comments ) > 0 ) {
 		
-			// Get the comment image meta
-			$comment_image = get_comment_meta( $comment->comment_ID, 'comment_image', true );
+			$comment = $comments[ count( $comments ) - 1 ];
+	
+			// If the comment image meta value exists, then render the comment image
+			if( false != get_comment_meta( $comment->comment_ID, 'comment_image' ) ) {
 			
-			// Render it in a paragraph element appended to the comment
-			$comment->comment_content .= '<p class="comment-image">';
-				$comment->comment_content .= '<img src="' . $comment_image['url'] . '" alt="" />';
-			$comment->comment_content .= '</p><!-- /.comment-image -->';	
-			
+				// Get the comment image meta
+				$comment_image = get_comment_meta( $comment->comment_ID, 'comment_image', true );
+				
+				// Render it in a paragraph element appended to the comment
+				$comment->comment_content .= '<p class="comment-image">';
+					$comment->comment_content .= '<img src="' . $comment_image['url'] . '" alt="" />';
+				$comment->comment_content .= '</p><!-- /.comment-image -->';	
+				
+			} // end if
+		
 		} // end if
 		
 		return $comments;
