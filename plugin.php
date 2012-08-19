@@ -3,7 +3,7 @@
 Plugin Name: Comment Images
 Plugin URI: http://tommcfarlin.com/comment-images
 Description: Allow your readers easily to attach an image to their comment.
-Version: 1.3
+Version: 1.4
 Author: Tom McFarlin
 Author URI: http://tommcfarlin.com
 Author Email: tom@tommcfarlin.com
@@ -154,7 +154,7 @@ class Comment_Image {
 	/**
 	 * Adds the comment image upload form to the comment form.
 	 *
-	 * @params	$post_id	The ID of the post on which the comment is being added.
+	 * @param	$post_id	The ID of the post on which the comment is being added.
 	 */
  	function add_image_upload_form( $post_id ) {
 
@@ -176,7 +176,7 @@ class Comment_Image {
 	/**
 	 * Adds the comment image upload form to the comment form.
 	 *
-	 * @params	$comment_id	The ID of the comment to which we're adding the image.
+	 * @param	$comment_id	The ID of the comment to which we're adding the image.
 	 */
 	function save_comment_image( $comment_id ) {
 
@@ -215,32 +215,35 @@ class Comment_Image {
 	/**
 	 * Appends the image below the content of the comment.
 	 *
-	 * @params	$comment	The content of the comment.
+	 * @param	$comment	The content of the comment.
 	 */
 	function display_comment_image( $comments ) {
-		
-		// Get the most recent comment
+
+		// Make sure that there are comments
 		if( count( $comments ) > 0 ) {
 		
-			$comment = $comments[ count( $comments ) - 1 ];
-	
-			// If the comment image meta value exists, then render the comment image
-			if( false != get_comment_meta( $comment->comment_ID, 'comment_image' ) ) {
+			// Loop through each comment...
+			foreach( $comments as $comment ) {
 			
-				// Get the comment image meta
-				$comment_image = get_comment_meta( $comment->comment_ID, 'comment_image', true );
+				// ...and if the comment has a comment image...
+				if( true == get_comment_meta( $comment->comment_ID, 'comment_image' ) ) {
+			
+					// ...get the comment image meta
+					$comment_image = get_comment_meta( $comment->comment_ID, 'comment_image', true );
+					
+					// ...and render it in a paragraph element appended to the comment
+					$comment->comment_content .= '<p class="comment-image">';
+						$comment->comment_content .= '<img src="' . $comment_image['url'] . '" alt="" />';
+					$comment->comment_content .= '</p><!-- /.comment-image -->';	
 				
-				// Render it in a paragraph element appended to the comment
-				$comment->comment_content .= '<p class="comment-image">';
-					$comment->comment_content .= '<img src="' . $comment_image['url'] . '" alt="" />';
-				$comment->comment_content .= '</p><!-- /.comment-image -->';	
+				} // end if
 				
-			} // end if
-		
+			} // end foreach
+			
 		} // end if
 		
 		return $comments;
-		
+
 	} // end display_comment_image
 	
 	/*--------------------------------------------*
@@ -248,8 +251,10 @@ class Comment_Image {
 	 *---------------------------------------------*/
 	
 	/**
-	 * @params	$type	The file type attempting to be uploaded.
-	 * @returns			Whether or not the specified file type is able to be uploaded.
+	 * Determines if the specified type if a valid file type to be uploaded.
+	 *
+	 * @param	$type	The file type attempting to be uploaded.
+	 * @return			Whether or not the specified file type is able to be uploaded.
 	 */ 
 	private function is_valid_file_type( $type ) { 
 	
@@ -259,7 +264,9 @@ class Comment_Image {
 	} // end is_valid_file_type
 	
 	/**
-	 * @returns			Whether or not the hosting environment supports the ability to upload files.
+	 * Determines if the hosting environment allows the users to upload files.
+	 *
+	 * @return			Whether or not the hosting environment supports the ability to upload files.
 	 */ 
 	private function can_save_files() {
 		return function_exists( 'file_get_contents' );
