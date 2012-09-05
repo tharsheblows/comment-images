@@ -1,11 +1,12 @@
 <?php
 /*
 Plugin Name: Comment Images
-Plugin URI: http://tommcfarlin.com/comment-images
+Donate URI: http://tommcfarlin.com/donate/
+Plugin URI: http://tommcfarlin.com/comment-images/
 Description: Allow your readers easily to attach an image to their comment.
-Version: 1.4
+Version: 1.5
 Author: Tom McFarlin
-Author URI: http://tommcfarlin.com
+Author URI: http://tommcfarlin.com/
 Author Email: tom@tommcfarlin.com
 License:
 
