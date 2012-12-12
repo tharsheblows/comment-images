@@ -4,7 +4,7 @@ Plugin Name: Comment Images
 Donate URI: http://tommcfarlin.com/donate/
 Plugin URI: http://tommcfarlin.com/comment-images/
 Description: Allow your readers easily to attach an image to their comment.
-Version: 1.5
+Version: 1.6
 Author: Tom McFarlin
 Author URI: http://tommcfarlin.com/
 Author Email: tom@tommcfarlin.com
@@ -41,7 +41,11 @@ class Comment_Image {
 	 */
 	function __construct() {
 	
-		load_plugin_textdomain( 'comment-images', false, dirname( plugin_basename( __FILE__ ) ) . '/lang' );
+		// Load plugin textdomain
+		add_action( 'init', array( $this, 'plugin_textdomain' ) );
+		
+		// Setup the activation hook specifically for checking for the custom.css file
+		register_activation_hook( __FILE__, array( $this, 'activate' ) );
 	
 		// Determine if the hosting environment can save files.
 		if( $this->can_save_files() ) {
@@ -52,16 +56,16 @@ class Comment_Image {
 			} // end if
 	
 			// Add comment related stylesheets, scripts, form manipulation, and image serialization
-			add_action( 'wp_enqueue_scripts', array( &$this, 'add_styles' ) );
-			add_action( 'wp_enqueue_scripts', array( &$this, 'add_scripts' ) );
-			add_action( 'comment_form' , array( &$this, 'add_image_upload_form' ) );
-			add_filter( 'wp_insert_comment', array( &$this, 'save_comment_image' ) );
-			add_filter( 'comments_array', array( &$this, 'display_comment_image' ) );
+			add_action( 'wp_enqueue_scripts', array( $this, 'add_styles' ) );
+			add_action( 'wp_enqueue_scripts', array( $this, 'add_scripts' ) );
+			add_action( 'comment_form' , array( $this, 'add_image_upload_form' ) );
+			add_filter( 'wp_insert_comment', array( $this, 'save_comment_image' ) );
+			add_filter( 'comments_array', array( $this, 'display_comment_image' ) );
 			
 		// If not, display a notice.	
 		} else {
 		
-			add_action( 'admin_notices', array( &$this, 'save_error_notice' ) );
+			add_action( 'admin_notices', array( $this, 'save_error_notice' ) );
 			
 		} // end if/else
 
@@ -70,6 +74,29 @@ class Comment_Image {
 	/*--------------------------------------------*
 	 * Core Functions
 	 *---------------------------------------------*/
+	 
+	 /**
+	  * Checks to see if a custom.css file exists. If not, creates it; otherwise, does nothing. This will
+	  * prevent customizations from being overwritten in future upgrades.
+	  */
+	 function activate() {
+		 
+		 // The path where the custom.css should be stored.
+		 $str_custom_path =  dirname( __FILE__ ) . '/css/custom.css';
+		 
+		 // If the custom.css file doesn't exist, then we create it
+		 if( ! file_exists( $str_custom_path ) ) {
+			 file_put_contents( $str_custom_path, '' );
+		 } // end if
+		 
+	 } // end activate
+	 
+	 /**
+	  * Loads the plugin text domain for translation
+	  */
+	 function plugin_textdomain() {
+		 load_plugin_textdomain( 'comment-images', false, dirname( plugin_basename( __FILE__ ) ) . '/lang' );
+	 } // end plugin_textdomain
 	 
 	 /**
 	  * In previous versions of the plugin, the image were written out after the comments. Now,
