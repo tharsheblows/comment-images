@@ -4,7 +4,7 @@ Donate link: http://tommcfarlin.com/donate
 Tags: comments, image
 Requires at least: 3.4.1
 Tested up to: 3.5
-Stable tag: 1.6
+Stable tag: 1.6.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,10 @@ Same as above :)
 4. The administrator's dashboard notice when their hosting environment doesn't allow uploads
 
 == Changelog ==
+
+= 1.6.1 =
+* Improving support for adding custom.css so that the file is also managed properly during the plugin update process
+* Updating localization files
 
 = 1.6 =
 * Adding a support for a custom.css file
