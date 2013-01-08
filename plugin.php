@@ -4,7 +4,7 @@ Plugin Name: Comment Images
 Donate URI: http://tommcfarlin.com/donate/
 Plugin URI: http://tommcfarlin.com/comment-images/
 Description: Allow your readers easily to attach an image to their comment.
-Version: 1.6.1
+Version: 1.6.2
 Author: Tom McFarlin
 Author URI: http://tommcfarlin.com/
 Author Email: tom@tommcfarlin.com
@@ -48,9 +48,11 @@ class Comment_Image {
 		 * I'm calling the same function using the activation hook - which is when the user activates the plugin,
 		 * and during upgrade plugin event. This ensures that the custom.css file can also be managed
 		 * when the plugin is updated.
+		 *
+		 * TODO: Restore this plugin when I've resolved the transient functionality properly.
 		 */
-		register_activation_hook( __FILE__, array( $this, 'activate' ) );
-		add_action( 'pre_set_site_transient_update_plugins', array( $this, 'activate' ) );
+		//register_activation_hook( __FILE__, array( $this, 'activate' ) );
+		//add_action( 'pre_set_site_transient_update_plugins', array( $this, 'activate' ) );
 	
 		// Determine if the hosting environment can save files.
 		if( $this->can_save_files() ) {
@@ -79,22 +81,6 @@ class Comment_Image {
 	/*--------------------------------------------*
 	 * Core Functions
 	 *---------------------------------------------*/
-	 
-	 /**
-	  * Checks to see if a custom.css file exists. If not, creates it; otherwise, does nothing. This will
-	  * prevent customizations from being overwritten in future upgrades.
-	  */
-	 function activate() {
-		 
-		 // The path where the custom.css should be stored.
-		 $str_custom_path =  dirname( __FILE__ ) . '/css/custom.css';
-		 
-		 // If the custom.css file doesn't exist, then we create it
-		 if( is_writable ( $str_custom_path ) && ! file_exists( $str_custom_path ) ) {
-			 file_put_contents( $str_custom_path, '' );
-		 } // end if
-		 
-	 } // end activate
 	 
 	 /**
 	  * Loads the plugin text domain for translation
