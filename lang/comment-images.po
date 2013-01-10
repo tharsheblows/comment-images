@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Comment Images 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-13 22:22-0500\n"
-"PO-Revision-Date: 2012-12-13 22:22-0500\n"
+"POT-Creation-Date: 2013-01-09 21:41-0500\n"
+"PO-Revision-Date: 2013-01-09 21:41-0500\n"
 "Last-Translator: Tom McFarlin <tom@tommcfarlin.com>\n"
 "Language-Team: Tom McFarlin <tom@tommcfarlin.com>\n"
 "Language: en_US\n"
@@ -15,18 +15,34 @@ msgstr ""
 "X-Generator: Poedit 1.5.4\n"
 "X-Poedit-SearchPath-0: ..\n"
 
-#: ../plugin.php:151
+#: ../plugin.php:127
 msgid ""
 "<strong>Comment Images Notice:</strong> Unfortunately, your host does not "
 "allow uploads from the comment form. This plugin will not work for your host."
 msgstr ""
 
-#: ../plugin.php:197
+#: ../plugin.php:173
 msgid ""
 "<strong>Heads up!</strong> You are attempting to upload an invalid image. If "
 "saved, this image will not display with your comment."
 msgstr ""
 
-#: ../plugin.php:200
+#: ../plugin.php:176
 msgid "Select an image for your comment (GIF, PNG, JPG, JPEG):"
+msgstr ""
+
+#: ../plugin.php:271
+msgid "png"
+msgstr ""
+
+#: ../plugin.php:271
+msgid "gif"
+msgstr ""
+
+#: ../plugin.php:271
+msgid "jpg"
+msgstr ""
+
+#: ../plugin.php:271
+msgid "jpeg"
 msgstr ""

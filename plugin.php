@@ -4,13 +4,13 @@ Plugin Name: Comment Images
 Donate URI: http://tommcfarlin.com/donate/
 Plugin URI: http://tommcfarlin.com/comment-images/
 Description: Allow your readers easily to attach an image to their comment.
-Version: 1.6.2
+Version: 1.7
 Author: Tom McFarlin
 Author URI: http://tommcfarlin.com/
 Author Email: tom@tommcfarlin.com
 License:
 
-  Copyright 2012 Tom McFarlin (tom@tommcfarlin.com)
+  Copyright 2013 Tom McFarlin (tom@tommcfarlin.com)
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License, version 2, as 
@@ -43,16 +43,6 @@ class Comment_Image {
 	
 		// Load plugin textdomain
 		add_action( 'init', array( $this, 'plugin_textdomain' ) );
-		
-		/* Setup the activation hook specifically for checking for the custom.css file
-		 * I'm calling the same function using the activation hook - which is when the user activates the plugin,
-		 * and during upgrade plugin event. This ensures that the custom.css file can also be managed
-		 * when the plugin is updated.
-		 *
-		 * TODO: Restore this plugin when I've resolved the transient functionality properly.
-		 */
-		//register_activation_hook( __FILE__, array( $this, 'activate' ) );
-		//add_action( 'pre_set_site_transient_update_plugins', array( $this, 'activate' ) );
 	
 		// Determine if the hosting environment can save files.
 		if( $this->can_save_files() ) {
@@ -278,7 +268,7 @@ class Comment_Image {
 	private function is_valid_file_type( $type ) { 
 	
 		$type = strtolower( trim ( $type ) );
-		return $type == 'png' || $type == 'gif' || $type == 'jpg' || $type == 'jpeg';
+		return $type == __( 'png', 'comment-images' ) || $type == __( 'gif', 'comment-images' ) || $type == __( 'jpg', 'comment-images' ) || $type == __( 'jpeg', 'comment-images' );
 		
 	} // end is_valid_file_type
 	
