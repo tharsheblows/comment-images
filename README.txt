@@ -3,8 +3,8 @@ Contributors: tommcfarlin
 Donate link: http://tommcfarlin.com/donate
 Tags: comments, image
 Requires at least: 3.4.1
-Tested up to: 3.5
-Stable tag: 1.7
+Tested up to: 3.5.1
+Stable tag: 1.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,9 +20,11 @@ Comment Images...
 * Supports PNG, GIF, JPG, and JPEG images
 * Will notify readers if their attached image is not allowed to be uploaded
 * Styles images so that they will fit within the comment display and not "bleed over" into the page
+* Provides dashboard functionality for seeing the images that are attached to each comment
+* Makes the images available in the Media Uploader
 * Is fully localized and ready for translation
 
-For more information or to follow the project, check out the [project page](http://tommcfarlin.com/projects/comment-images).
+For more information or to follow the project, check out the [project page](http://tommcfarlin.com/projects/comment-images/).
 
 == Installation ==
 
@@ -41,6 +43,10 @@ For more information or to follow the project, check out the [project page](http
 
 == Frequently Asked Questions ==
 
+= Is this plugin compatible with P2? =
+
+Not yet, but it's on the roadmap.
+
 = Is this plugin compatible with JetPack comments? =
 
 Currently, no. Comment Images is only compatible with the standard WordPress comment form.
@@ -55,8 +61,20 @@ Same as above :)
 2. How the comment will appear once the image has been uploaded
 3. The error message displayed when an invalid file is selected
 4. The administrator's dashboard notice when their hosting environment doesn't allow uploads
+5. The updated Comments Dashboard showing the Comment Image for each comment
+6. The 'Recent Comments' widget showing a link when a recent comment as a comment image
+7. The 'Comments' dashboard for a given post displaying the comment and the comment image
+8. The updated 'All Posts' view showing when a post's comments contain comment images
 
 == Changelog ==
+
+= 1.8 =
+* Made the comment images available in the Media Uploader
+* Added an option in the 'Recent Comments' Dashboard widget to link to the images for the comment
+* Added a column on the 'All Posts' view that display if there are comment images for the given post
+* Added the notification on the 'All Posts' view to link to that posts comments
+* Added a column to the 'Comments' page that displays the comment image associated with the given comment
+* Disable comments on a per post basis from the post dashboard
 
 = 1.7 =
 * Adding support for international languages in the file types
