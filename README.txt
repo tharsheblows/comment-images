@@ -4,7 +4,7 @@ Donate link: http://tommcfarlin.com/donate
 Tags: comments, image
 Requires at least: 3.4.1
 Tested up to: 3.5.1
-Stable tag: 1.8
+Stable tag: 1.8.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -67,6 +67,9 @@ Same as above :)
 8. The updated 'All Posts' view showing when a post's comments contain comment images
 
 == Changelog ==
+
+= 1.8.1
+* Fixing a small case of being able to toggle the comment field on and off.
 
 = 1.8 =
 * Made the comment images available in the Media Uploader

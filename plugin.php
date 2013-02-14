@@ -4,7 +4,7 @@ Plugin Name: Comment Images
 Donate URI: http://tommcfarlin.com/donate/
 Plugin URI: http://tommcfarlin.com/comment-images/
 Description: Allow your readers easily to attach an image to their comment.
-Version: 1.8
+Version: 1.8.1
 Author: Tom McFarlin
 Author URI: http://tommcfarlin.com/
 Author Email: tom@tommcfarlin.com
@@ -324,7 +324,7 @@ class Comment_Image {
  	function add_image_upload_form( $post_id ) {
 
 	 	// Create the label and the input field for uploading an image
-	 	if( 'enable' == get_post_meta( $post_id, 'comment_images_toggle', true ) ) {
+	 	if( 'disable' != get_post_meta( $post_id, 'comment_images_toggle', true ) ) {
 	 	
 		 	$html = '<div id="comment-image-wrapper">';
 			 	$html .= '<p id="comment-image-error">';
