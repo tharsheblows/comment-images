@@ -4,7 +4,7 @@ Plugin Name: Comment Images
 Donate URI: http://tommcfarlin.com/donate/
 Plugin URI: http://tommcfarlin.com/comment-images/
 Description: Allow your readers easily to attach an image to their comment.
-Version: 1.8.1
+Version: 1.8.2
 Author: Tom McFarlin
 Author URI: http://tommcfarlin.com/
 Author Email: tom@tommcfarlin.com
@@ -82,15 +82,15 @@ class Comment_Image {
 			add_filter( 'comments_array', array( $this, 'display_comment_image' ) );
 			
 			// Add a note to recent comments that they have Comment Images
-			add_filter( 'comment_row_actions', array( $this, 'recent_comment_has_image' ), 10, 2 );
+			add_filter( 'comment_row_actions', array( $this, 'recent_comment_has_image' ), 20, 2 );
 			
 			// Add a column to the Post editor indicating if there are Comment Images
 			add_filter( 'manage_posts_columns', array( $this, 'post_has_comment_images' ) );
-			add_filter( 'manage_posts_custom_column', array( $this, 'post_comment_images' ), 10, 2 );
+			add_filter( 'manage_posts_custom_column', array( $this, 'post_comment_images' ), 20, 2 );
 			
 			// Add a column to the comment images if there is an image for the given comment
 			add_filter( 'manage_edit-comments_columns', array( $this, 'comment_has_image' ) );
-			add_filter( 'manage_comments_custom_column', array( $this, 'comment_image' ), 10, 2 );
+			add_filter( 'manage_comments_custom_column', array( $this, 'comment_image' ), 20, 2 );
 			
 			// Setup the Project Completion metabox
 			add_action( 'add_meta_boxes', array( $this, 'add_comment_image_meta_box' ) );
@@ -134,7 +134,7 @@ class Comment_Image {
 	  * @since	1.8
 	  */
 	 public function post_comment_images( $column_name, $post_id ) {
-		 
+
 		 if( 'comment-images' == strtolower( $column_name ) ) {
 		 
 		 	// Get the comments for the current post.
@@ -191,15 +191,19 @@ class Comment_Image {
 	  * @since	1.8
 	  */
 	 public function comment_image( $column_name, $comment_id ) {
-		 
-		 if( 0 != ( $comment_image_data = get_comment_meta( $comment_id, 'comment_image', true ) ) ) {
 
-			 $image_url = $comment_image_data['url'];
-			 $html = '<img src="' . $image_url . '" width="150" />';
+		 if( 'comment-image' == strtolower( $column_name ) ) {
+
+			 if( 0 != ( $comment_image_data = get_comment_meta( $comment_id, 'comment_image', true ) ) ) {
+	
+				 $image_url = $comment_image_data['url'];
+				 $html = '<img src="' . $image_url . '" width="150" />';
+				 
+				 echo $html;
 			 
-			 echo $html;
-		 
- 		 } // end if
+	 		 } // end if
+ 		 
+ 		 } // end if/else
 		 
 	 } // end comment_image
 	 
