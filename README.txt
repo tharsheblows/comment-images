@@ -1,10 +1,10 @@
 === Comment Images ===
 Contributors: tommcfarlin
-Donate link: http://tommcfarlin.com/donate
+Donate link: http://tommcfarlin.com/donate/
 Tags: comments, image
 Requires at least: 3.4.1
 Tested up to: 3.5.1
-Stable tag: 1.9
+Stable tag: 1.10
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -67,6 +67,9 @@ Same as above :)
 8. The updated 'All Posts' view showing when a post's comments contain comment images
 
 == Changelog ==
+
+= 1.10 =
+* Adding the Spanish language translations (thanks to Martin Heinrich)
 
 = 1.9 =
 * Adding the German language translations
