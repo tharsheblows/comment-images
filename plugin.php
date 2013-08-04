@@ -4,7 +4,7 @@ Plugin Name: Comment Images
 Donate URI: http://tommcfarlin.com/donate/
 Plugin URI: http://tommcfarlin.com/comment-images/
 Description: Allow your readers easily to attach an image to their comment.
-Version: 1.10
+Version: 1.11.0
 Author: Tom McFarlin
 Author URI: http://tommcfarlin.com/
 Author Email: tom@tommcfarlin.com
@@ -72,9 +72,11 @@ class Comment_Image {
 				$this->update_old_comments();
 			} // end if
 
-			// Add comment related stylesheets and Java Script
+			// Add comment related stylesheets and JavaScript
 			add_action( 'wp_enqueue_scripts', array( $this, 'add_styles' ) );
 			add_action( 'wp_enqueue_scripts', array( $this, 'add_scripts' ) );
+			add_action( 'admin_enqueue_scripts', array( $this, 'add_admin_styles' ) );
+			add_action( 'admin_enqueue_scripts', array( $this, 'add_admin_scripts' ) );
 
 			// Add the Upload input to the comment form
 			add_action( 'comment_form' , array( $this, 'add_image_upload_form' ) );
@@ -321,6 +323,30 @@ class Comment_Image {
 	} // end add_scripts
 
 	/**
+	 * Adds the public JavaScript to the single post editor
+	 */
+	function add_admin_styles() {
+
+		$screen = get_current_screen();
+		if( 'post' === $screen->id ) {
+			wp_enqueue_style( 'comment-images-admin', plugins_url( '/comment-images/css/admin.css' ) );
+		} // end if
+
+	} // end add_admin_styles
+
+	/**
+	 * Adds the public JavaScript to the single post editor
+	 */
+	function add_admin_scripts() {
+
+		$screen = get_current_screen();
+		if( 'post' === $screen->id ) {
+			wp_enqueue_script( 'comment-images', plugins_url( '/comment-images/js/admin.min.js' ), array( 'jquery' ) );
+		} // end if
+
+	} // end add_admin_scripts
+
+	/**
 	 * Adds the comment image upload form to the comment form.
 	 *
 	 * @param	$post_id	The ID of the post on which the comment is being added.
@@ -328,7 +354,7 @@ class Comment_Image {
  	function add_image_upload_form( $post_id ) {
 
 	 	// Create the label and the input field for uploading an image
-	 	if( 'disable' != get_post_meta( $post_id, 'comment_images_toggle', true ) ) {
+	 	if ( 'enable' == get_post_meta( $post_id, 'comment_images_toggle', true ) ) {
 
 		 	$html = '<div id="comment-image-wrapper">';
 			 	$html .= '<p id="comment-image-error">';
@@ -338,6 +364,7 @@ class Comment_Image {
 				 	$html .= __( 'Select an image for your comment (GIF, PNG, JPG, JPEG):', 'comment-images' );
 				 $html .= "</label>";
 				 $html .= "<input type='file' name='comment_image_$post_id' id='comment_image' />";
+
 			 $html .= '</div><!-- #comment-image-wrapper -->';
 
 			 echo $html;
@@ -460,10 +487,32 @@ class Comment_Image {
 
 		 wp_nonce_field( plugin_basename( __FILE__ ), 'comment_images_display_nonce' );
 
-		 $html = '<select name="comment_images_toggle" id="comment_images_toggle" class="comment_images_toggle_select">';
+		 $html = '<p class="comment-image-info">' . __( 'Doing this will only update <strong>this</strong> post.', 'comment_image' ) . '</p>';
+		 $html .= '<select name="comment_images_toggle" id="comment_images_toggle" class="comment_images_toggle_select">';
 		 	$html .= '<option value="enable" ' . selected( 'enable', get_post_meta( $post->ID, 'comment_images_toggle', true ), false ) . '>' . __( 'Enable comment images for this post.', 'comment-images' ) . '</option>';
 		 	$html .= '<option value="disable" ' . selected( 'disable', get_post_meta( $post->ID, 'comment_images_toggle', true ), false ) . '>' . __( 'Disable comment images for this post.', 'comment-images' ) . '</option>';
 		 $html .= '</select>';
+
+		 $html .= '<hr />';
+
+		 $comment_image_state = 'disabled';
+		 if( '' == get_option( 'comment_image_toggle_state' ) || 'enabled' == get_option( 'comment_image_toggle_state' ) ) {
+			 $comment_image_state = 'enabled';
+		 } // end if/else
+
+		 $html .= '<p class="comment-image-warning">' . __( 'Doing this will update <strong>all</strong> posts.', 'comment_image' ) . '</p>';
+		 if( 'enabled' == $comment_image_state ) {
+
+			 $html .= '<input type="button" class="button" name="comment_image_toggle" id="comment_image_toggle" value="' . __( 'Disable Comments For All Posts', 'comment_image' ) . '"/>';
+
+		 } else {
+
+			 $html .= '<input type="button" class="button" name="comment_image_toggle" id="comment_image_toggle" value="' . __( 'Enable Comments For All Posts', 'comment_image' ) . '"/>';
+
+		 } // end if/else
+
+		 $html .= '<input type="hidden" name="comment_image_toggle_state" id="comment_image_toggle_state" value="' . $comment_image_state . '"/>';
+		 $html .= '<input type="hidden" name="comment_image_source" id="comment_image_source" value=""/>';
 
 		 echo $html;
 
@@ -480,11 +529,31 @@ class Comment_Image {
 		 // If the user has permission to save the meta data...
 		 if( $this->user_can_save( $post_id, 'comment_images_display_nonce' ) ) {
 
-		 	// Delete any existing meta data for the owner
-			if( get_post_meta( $post_id, 'comment_images_toggle' ) ) {
-				delete_post_meta( $post_id, 'comment_images_toggle' );
-			} // end if
-			update_post_meta( $post_id, 'comment_images_toggle', $_POST[ 'comment_images_toggle' ] );
+			// Only do this if the source of the request is from the button
+			if( isset( $_POST['comment_image_source'] ) && 'button' == $_POST['comment_image_source'] ) {
+
+				if( '' == get_option( 'comment_image_toggle_state' ) || 'enabled' == get_option( 'comment_image_toggle_state' ) ) {
+
+					$this->toggle_all_comment_images( 'disable' );
+					update_option( 'comment_image_toggle_state', 'disabled' );
+
+				} elseif ( 'disabled' == get_option( 'comment_image_toggle_state' ) ) {
+
+					$this->toggle_all_comment_images( 'enable' );
+					update_option( 'comment_image_toggle_state', 'enabled' );
+
+				} // end if
+
+			// Otherwise, we're doing this for the post-by-post basis with the select box
+			} else {
+
+			 	// Delete any existing meta data for the owner
+				if( get_post_meta( $post_id, 'comment_images_toggle' ) ) {
+					delete_post_meta( $post_id, 'comment_images_toggle' );
+				} // end if
+				update_post_meta( $post_id, 'comment_images_toggle', $_POST[ 'comment_images_toggle' ] );
+
+			} // end if/else
 
 		 } // end if
 
@@ -492,7 +561,38 @@ class Comment_Image {
 
 	/*--------------------------------------------*
 	 * Utility Functions
-	 *---------------------------------------------*/
+	 *--------------------------------------------*/
+
+	 /**
+	  * Loads up all posts and toggles the post meta for each post enabling or disabling comment images
+	  * for all posts.
+	  *
+	  * @param    string    $str_state    Whether or not we are enabling or disabling comment images.
+	  */
+	 private function toggle_all_comment_images( $str_state ) {
+
+		 // First, create the query to pull back all published posts
+		 $args = array(
+		 	'post_type'    =>    'post',
+		 	'post_status'  =>    array( 'publish', 'private' )
+		 );
+		 $query = new WP_Query( $args );
+
+		 // Now loop through each post and update its meta data
+		 while( $query->have_posts() ) {
+
+			$query->the_post();
+
+			// If post meta exists, delete it, then specify our value
+			if( get_post_meta( get_the_ID(), 'comment_images_toggle' ) ) {
+				delete_post_meta( get_the_ID(), 'comment_images_toggle' );
+			} // end if
+			update_post_meta( get_the_ID(), 'comment_images_toggle', $str_state );
+
+		 } // end while
+		 wp_reset_postdata();
+
+	 } // end toggle_all_comment_images
 
 	/**
 	 * Determines if the specified type if a valid file type to be uploaded.
