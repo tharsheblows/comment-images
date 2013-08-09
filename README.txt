@@ -4,7 +4,7 @@ Donate link: http://tommcfarlin.com/donate/
 Tags: comments, image
 Requires at least: 3.4.1
 Tested up to: 3.6.0
-Stable tag: 1.11.0
+Stable tag: 1.12.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -67,6 +67,12 @@ Same as above :)
 8. The updated 'All Posts' view showing when a post's comments contain comment images
 
 == Changelog ==
+
+= 1.12.0 =
+* Making sure that comment images can be added to both posts and pages
+* Making sure that comment images are enabled by default (rather than disabled)
+* Removing closing PHP tag from the end of the plugin file
+* Implementing the singleton pattern and splitting the plugin into two files
 
 = 1.11.0 =
 * Adding an option to disable/enable comments for *all* posts

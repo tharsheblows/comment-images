@@ -1,43 +1,12 @@
 <?php
-/*
-Plugin Name: Comment Images
-Donate URI: http://tommcfarlin.com/donate/
-Plugin URI: http://tommcfarlin.com/comment-images/
-Description: Allow your readers easily to attach an image to their comment.
-Version: 1.11.0
-Author: Tom McFarlin
-Author URI: http://tommcfarlin.com/
-Author Email: tom@tommcfarlin.com
-License:
-
-  Copyright 2012 - 2013 Tom McFarlin (tom@tommcfarlin.com)
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License, version 2, as
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
-
 /**
- * Backlog
+ * Comment Image
  *
- *  + Features
- *		- P2 Compatibility
- *		- JetPack compatibility
- *		- Is there a way to re-size the images before uploading?
- *		- User's shouldn't have to enter text to leave a comment.
- *
- *	+ Bugs
- * 		- Warning: file_get_contents() [function.file-get-contents]: Filename cannot be empty in /home/[masked]/public_html/wp-content/plugins/comment-images/plugin.php on line 199
- *		- I actually tested the plugin on my original enquiry and it appears that the images actually get *removed* from the comments when the plugin is disabled.
+ * @package   Comment_Image
+ * @author    Tom McFarlin <tom@tommcfarlin.com>
+ * @license   GPL-2.0+
+ * @link      http://tommcfarlin.com
+ * @copyright 2013 Tom McFarlin
  */
 
 /**
@@ -50,6 +19,12 @@ require_once(ABSPATH . 'wp-admin/includes/media.php');
 require_once(ABSPATH . 'wp-admin/includes/file.php');
 require_once(ABSPATH . 'wp-admin/includes/image.php');
 
+/**
+ * Comment Image
+ *
+ * @package Comment_Image
+ * @author  Tom McFarlin <tom@tommcfarlin.com>
+ */
 class Comment_Image {
 
 	/*--------------------------------------------*
@@ -57,9 +32,36 @@ class Comment_Image {
 	 *--------------------------------------------*/
 
 	/**
+	 * Instance of this class.
+	 *
+	 * @since    1.0.0
+	 *
+	 * @var      object
+	 */
+	protected static $instance = null;
+
+	/**
+	 * Return an instance of this class.
+	 *
+	 * @since     1.0.0
+	 *
+	 * @return    object    A single instance of this class.
+	 */
+	public static function get_instance() {
+
+		// If the single instance hasn't been set, set it now.
+		if ( null == self::$instance ) {
+			self::$instance = new self;
+		} // end if
+
+		return self::$instance;
+
+	} // end get_instance
+
+	/**
 	 * Initializes the plugin by setting localization, admin styles, and content filters.
 	 */
-	function __construct() {
+	private function __construct() {
 
 		// Load plugin textdomain
 		add_action( 'init', array( $this, 'plugin_textdomain' ) );
@@ -71,6 +73,9 @@ class Comment_Image {
 			if( false == get_option( 'update_comment_images' ) || null == get_option( 'update_comment_images' ) ) {
 				$this->update_old_comments();
 			} // end if
+
+			// Go ahead and enable comment images site wide
+			add_option( 'comment_image_toggle_state', 'enabled' );
 
 			// Add comment related stylesheets and JavaScript
 			add_action( 'wp_enqueue_scripts', array( $this, 'add_styles' ) );
@@ -328,7 +333,7 @@ class Comment_Image {
 	function add_admin_styles() {
 
 		$screen = get_current_screen();
-		if( 'post' === $screen->id ) {
+		if( 'post' === $screen->id || 'page' == $screen->id ) {
 			wp_enqueue_style( 'comment-images-admin', plugins_url( '/comment-images/css/admin.css' ) );
 		} // end if
 
@@ -340,7 +345,7 @@ class Comment_Image {
 	function add_admin_scripts() {
 
 		$screen = get_current_screen();
-		if( 'post' === $screen->id ) {
+		if( 'post' === $screen->id || 'page' == $screen->id ) {
 			wp_enqueue_script( 'comment-images', plugins_url( '/comment-images/js/admin.min.js' ), array( 'jquery' ) );
 		} // end if
 
@@ -354,7 +359,7 @@ class Comment_Image {
  	function add_image_upload_form( $post_id ) {
 
 	 	// Create the label and the input field for uploading an image
-	 	if ( 'enable' == get_post_meta( $post_id, 'comment_images_toggle', true ) ) {
+	 	if ( 'enabled' == get_option( 'comment_image_toggle_state' ) || 'enable' == get_post_meta( $post_id, 'comment_images_toggle', true ) ) {
 
 		 	$html = '<div id="comment-image-wrapper">';
 			 	$html .= '<p id="comment-image-error">';
@@ -475,6 +480,15 @@ class Comment_Image {
 		 	'low'
 		 );
 
+		 add_meta_box(
+		 	'disable_comment_images',
+		 	__( 'Comment Images', 'comment-images' ),
+		 	array( $this, 'comment_images_display' ),
+		 	'page',
+		 	'side',
+		 	'low'
+		 );
+
 	 } // end add_project_completion_meta_box
 
 	 /**
@@ -573,7 +587,7 @@ class Comment_Image {
 
 		 // First, create the query to pull back all published posts
 		 $args = array(
-		 	'post_type'    =>    'post',
+		 	'post_type'    =>    array( 'post', 'page' ),
 		 	'post_status'  =>    array( 'publish', 'private' )
 		 );
 		 $query = new WP_Query( $args );
@@ -637,5 +651,16 @@ class Comment_Image {
 
 } // end class
 
-new Comment_Image();
-?>
+/**
+ * Backlog
+ *
+ *  + Features
+ *		- P2 Compatibility
+ *		- JetPack compatibility
+ *		- Is there a way to re-size the images before uploading?
+ *		- User's shouldn't have to enter text to leave a comment.
+ *
+ *	+ Bugs
+ * 		- Warning: file_get_contents() [function.file-get-contents]: Filename cannot be empty in /home/[masked]/public_html/wp-content/plugins/comment-images/plugin.php on line 199
+ *		- I actually tested the plugin on my original enquiry and it appears that the images actually get *removed* from the comments when the plugin is disabled.
+ */
