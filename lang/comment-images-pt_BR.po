@@ -2,84 +2,90 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Comment Images 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-12 17:02-0500\n"
-"PO-Revision-Date: 2013-12-12 17:02-0500\n"
-"Last-Translator: Tom McFarlin <tom@tommcfarlin.com>\n"
-"Language-Team: Tom McFarlin <tom@tommcfarlin.com>\n"
-"Language: en_US\n"
+"POT-Creation-Date: 2013-12-11 20:56-0000\n"
+"PO-Revision-Date: 2013-12-11 21:06-0000\n"
+"Last-Translator: Celso Azevedo <mail@celsoazevedo.net>\n"
+"Language-Team: Celso Azevedo <mail@celsoazevedo.net>\n"
+"Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: __;_e\n"
 "X-Poedit-Basepath: .\n"
 "X-Generator: Poedit 1.6.2\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Poedit-SearchPath-0: ..\n"
 
 #: ../class-comment-image.php:129 ../class-comment-image.php:231
 #: ../class-comment-image.php:476 ../class-comment-image.php:485
 msgid "Comment Images"
-msgstr ""
+msgstr "Imagens nos Comentários"
 
 #: ../class-comment-image.php:162
 msgid "View Post Comment Images"
-msgstr ""
+msgstr "Ver as Imagens do Comentário"
 
 #: ../class-comment-image.php:187
 msgid "Comment Image"
-msgstr ""
+msgstr "Imagem do Comentário"
 
 #: ../class-comment-image.php:294
 msgid ""
 "<strong>Comment Images Notice:</strong> Unfortunately, your host does not "
 "allow uploads from the comment form. This plugin will not work for your host."
 msgstr ""
+"<strong>Aviso do Comment Images:</strong> Infelizmente o seu alojamento não "
+"permite uploads a partir do formulário de comentários. Este plugin não "
+"funciona com este alojamento."
 
 #: ../class-comment-image.php:366
 msgid ""
 "<strong>Heads up!</strong> You are attempting to upload an invalid image. If "
 "saved, this image will not display with your comment."
 msgstr ""
+"<strong>Aviso!</strong> Está a tentar enviar uma imagem inválida. A imagem "
+"não vai aparecer com o seu comentário."
 
 #: ../class-comment-image.php:369
 msgid "Select an image for your comment (GIF, PNG, JPG, JPEG):"
-msgstr ""
+msgstr "Escolha uma imagem para o seu comentário (GIF, PNG, JPG, JPEG):"
 
 #: ../class-comment-image.php:504
 msgid "Doing this will only update <strong>this</strong> post."
-msgstr ""
+msgstr "Isto vai atualizar apenas <strong>este</strong> artigo."
 
 #: ../class-comment-image.php:506
 msgid "Enable comment images for this post."
-msgstr ""
+msgstr "Ativar as imagens nos comentários deste post."
 
 #: ../class-comment-image.php:507
 msgid "Disable comment images for this post."
-msgstr ""
+msgstr "Desativar as imagens nos comentários deste post."
 
 #: ../class-comment-image.php:517
 msgid "Doing this will update <strong>all</strong> posts."
-msgstr ""
+msgstr "Isto vai atualizar <strong>todos</strong> os artigos."
 
 #: ../class-comment-image.php:520
 msgid "Disable Comments For All Posts"
-msgstr ""
+msgstr "Desativar as Imagens em Todos os Posts"
 
 #: ../class-comment-image.php:524
 msgid "Enable Comments For All Posts"
-msgstr ""
+msgstr "Ativar Comentários em Todos os Artigos"
 
 #: ../class-comment-image.php:620
 msgid "png"
-msgstr ""
+msgstr "png"
 
 #: ../class-comment-image.php:620
 msgid "gif"
-msgstr ""
+msgstr "gif"
 
 #: ../class-comment-image.php:620
 msgid "jpg"
-msgstr ""
+msgstr "jpg"
 
 #: ../class-comment-image.php:620
 msgid "jpeg"
-msgstr ""
+msgstr "jpeg"

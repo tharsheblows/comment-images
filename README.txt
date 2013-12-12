@@ -3,8 +3,8 @@ Contributors: tommcfarlin
 Donate link: http://tommcfarlin.com/donate/
 Tags: comments, image
 Requires at least: 3.4.1
-Tested up to: 3.6.1
-Stable tag: 1.13.0
+Tested up to: 3.8.0
+Stable tag: 1.13.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -67,6 +67,12 @@ Same as above :)
 8. The updated 'All Posts' view showing when a post's comments contain comment images
 
 == Changelog ==
+
+= 1.13.1 =
+* Added Portuguese translations (props Celso Azevedo)
+* Fixed a problem that was making it impossible to translate two strings in the plugin
+* Updated to `comment-images.mo` file
+* Tested WordPress 3.8 compatibility
 
 = 1.13.0 =
 * Moving the screenshots to the assets directory to make the core plugin smaller
