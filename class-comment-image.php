@@ -363,7 +363,7 @@ class Comment_Image {
 
 		 	$html = '<div id="comment-image-wrapper">';
 			 	$html .= '<p id="comment-image-error">';
-			 		$html .= __( '<strong>Heads up!</strong> You are attempting to upload an invalid image. If saved, this image will not display with your comment.', 'comment-image' );
+			 		$html .= __( '<strong>Heads up!</strong> You are attempting to upload an invalid image. If saved, this image will not display with your comment.', 'comment-images' );
 			 	$html .= '</p>';
 				 $html .= "<label for='comment_image_$post_id'>";
 				 	$html .= __( 'Select an image for your comment (GIF, PNG, JPG, JPEG):', 'comment-images' );
@@ -501,7 +501,7 @@ class Comment_Image {
 
 		 wp_nonce_field( plugin_basename( __FILE__ ), 'comment_images_display_nonce' );
 
-		 $html = '<p class="comment-image-info">' . __( 'Doing this will only update <strong>this</strong> post.', 'comment-image' ) . '</p>';
+		 $html = '<p class="comment-image-info">' . __( 'Doing this will only update <strong>this</strong> post.', 'comment-images' ) . '</p>';
 		 $html .= '<select name="comment_images_toggle" id="comment_images_toggle" class="comment_images_toggle_select">';
 		 	$html .= '<option value="enable" ' . selected( 'enable', get_post_meta( $post->ID, 'comment_images_toggle', true ), false ) . '>' . __( 'Enable comment images for this post.', 'comment-images' ) . '</option>';
 		 	$html .= '<option value="disable" ' . selected( 'disable', get_post_meta( $post->ID, 'comment_images_toggle', true ), false ) . '>' . __( 'Disable comment images for this post.', 'comment-images' ) . '</option>';
@@ -514,14 +514,14 @@ class Comment_Image {
 			 $comment_image_state = 'enabled';
 		 } // end if/else
 
-		 $html .= '<p class="comment-image-warning">' . __( 'Doing this will update <strong>all</strong> posts.', 'comment-image' ) . '</p>';
+		 $html .= '<p class="comment-image-warning">' . __( 'Doing this will update <strong>all</strong> posts.', 'comment-images' ) . '</p>';
 		 if( 'enabled' == $comment_image_state ) {
 
 			 $html .= '<input type="button" class="button" name="comment_image_toggle" id="comment_image_toggle" value="' . __( 'Disable Comments For All Posts', 'comment-images' ) . '"/>';
 
 		 } else {
 
-			 $html .= '<input type="button" class="button" name="comment_image_toggle" id="comment_image_toggle" value="' . __( 'Enable Comments For All Posts', 'comment_image' ) . '"/>';
+			 $html .= '<input type="button" class="button" name="comment_image_toggle" id="comment_image_toggle" value="' . __( 'Enable Comments For All Posts', 'comment-images' ) . '"/>';
 
 		 } // end if/else
 
