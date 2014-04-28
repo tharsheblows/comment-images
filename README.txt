@@ -4,7 +4,7 @@ Donate link: http://tommcfarlin.com/donate/
 Tags: comments, image
 Requires at least: 3.4.1
 Tested up to: 3.9.0
-Stable tag: 1.14.0
+Stable tag: 1.15.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -67,6 +67,9 @@ Same as above :)
 8. The updated 'All Posts' view showing when a post's comments contain comment images
 
 == Changelog ==
+
+= 1.15.0 =
+* Adding Russian language files (props Flector at http://www.wordpressplugins.ru/komments/comment-images.html)
 
 = 1.14.0 =
 * Verifying WordPress 3.9 compatibility
