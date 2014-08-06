@@ -392,7 +392,7 @@ class Comment_Image {
 		$comment_image_id = "comment_image_$post_id";
 
 		// If the nonce is valid and the user uploaded an image, let's upload it to the server
-		if( isset( $_FILES[ $comment_image_id ] ) && ! empty( $_FILES[ $comment_image_id ] ) ) {
+		if( isset( $_FILES[ $comment_image_id ] ) && ! empty( $_FILES[ $comment_image_id ] ) && $_FILES[ $comment_image_id ]['size'] < 5000000 ) {
 
 			// Store the parts of the file name into an array
 			$file_name_parts = explode( '.', $_FILES[ $comment_image_id ]['name'] );
@@ -401,7 +401,7 @@ class Comment_Image {
 			if( $this->is_valid_file_type( $file_name_parts[ count( $file_name_parts ) - 1 ] ) ) {;
 
 				// Upload the comment image to the uploads directory
-				$comment_image_file = wp_upload_bits( $_FILES[ $comment_image_id ]['name'], null, file_get_contents( $_FILES[ $comment_image_id ]['tmp_name'] ) );
+				$comment_image_file = wp_upload_bits( $comment_id . '-' . $_FILES[ $comment_image_id ]['name'], null, file_get_contents( $_FILES[ $comment_image_id ]['tmp_name'] ) );
 
 				// Now, we need to actually create a post so that this shows up in the media uploader
 				$img_url = media_sideload_image( $comment_image_file['url'], $post_id );

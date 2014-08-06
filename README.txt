@@ -3,8 +3,8 @@ Contributors: tommcfarlin
 Donate link: http://tommcfarlin.com/donate/
 Tags: comments, image
 Requires at least: 3.4.1
-Tested up to: 3.9.0
-Stable tag: 1.15.0
+Tested up to: 3.9.2
+Stable tag: 1.16.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -67,6 +67,10 @@ Same as above :)
 8. The updated 'All Posts' view showing when a post's comments contain comment images
 
 == Changelog ==
+
+= 1.16.0 =
+* Limiting upload sizes to 5MB or less
+* Making sure that file image names will *always* be unique (h/t Вячеслав Колосов)
 
 = 1.15.0 =
 * Adding Russian language files (props Flector at http://www.wordpressplugins.ru/komments/comment-images.html)
