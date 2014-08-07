@@ -4,7 +4,7 @@ Donate link: http://tommcfarlin.com/donate/
 Tags: comments, image
 Requires at least: 3.4.1
 Tested up to: 3.9.2
-Stable tag: 1.16.0
+Stable tag: 1.17.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -67,6 +67,10 @@ Same as above :)
 8. The updated 'All Posts' view showing when a post's comments contain comment images
 
 == Changelog ==
+
+= 1.17.0 =
+* Additional fixes and checks to the file size
+* Localizing the text in the JavaScript for the public-facing view of the site (h/t Вячеслав Колосов)
 
 = 1.16.0 =
 * Limiting upload sizes to 5MB or less
