@@ -394,7 +394,19 @@ class Comment_Image {
 
 		$screen = get_current_screen();
 		if( 'post' === $screen->id || 'page' == $screen->id ) {
-			wp_enqueue_script( 'comment-images', plugins_url( '/comment-images/js/admin.min.js' ), array( 'jquery' ) );
+
+			wp_register_script( 'comment-images-admin', plugins_url( '/comment-images/js/admin.min.js' ), array( 'jquery' ) );
+
+            wp_localize_script(
+            	'comment-images-admin',
+            	'cm_imgs',
+            	array(
+                	'toggleConfirm' => __( 'By doing this, you will toggle Comment Images for all posts on your blog. Are you sure you want to do this?', 'comment-images' )
+				)
+			);
+
+			wp_enqueue_script( 'comment-images-admin' );
+
 		} // end if
 
 	} // end add_admin_scripts
@@ -407,17 +419,14 @@ class Comment_Image {
  	function add_image_upload_form( $post_id ) {
 
 	 	// Create the label and the input field for uploading an image
-	 	if ( 'enabled' == get_option( 'comment_image_toggle_state' ) || 'enable' == get_post_meta( $post_id, 'comment_images_toggle', true ) ) {
+	 	if ( 'disabled' != get_option( 'comment_image_toggle_state' ) && 'disable' != get_post_meta( $post_id, 'comment_images_toggle', true ) ) {
 
 		 	$html = '<div id="comment-image-wrapper">';
-			 	$html .= '<p id="comment-image-error">';
-			 		$html .= __( '<strong>Heads up!</strong> You are attempting to upload an invalid image. If saved, this image will not display with your comment.', 'comment-images' );
-			 	$html .= '</p>';
+			 	$html .= '<p id="comment-image-error"></p>';
 				 $html .= "<label for='comment_image_$post_id'>";
 				 	$html .= __( 'Select an image for your comment (GIF, PNG, JPG, JPEG):', 'comment-images' );
 				 $html .= "</label>";
 				 $html .= "<input type='file' name='comment_image_$post_id' id='comment_image' />";
-
 			 $html .= '</div><!-- #comment-image-wrapper -->';
 
 			 echo $html;
@@ -688,7 +697,10 @@ class Comment_Image {
 	private function is_valid_file_type( $type ) {
 
 		$type = strtolower( trim ( $type ) );
-		return $type == __( 'png', 'comment-images' ) || $type == __( 'gif', 'comment-images' ) || $type == __( 'jpg', 'comment-images' ) || $type == __( 'jpeg', 'comment-images' );
+		return 	$type == 'png' ||
+				$type == 'gif' ||
+				$type == 'jpg' ||
+				$type == 'jpeg';
 
 	} // end is_valid_file_type
 

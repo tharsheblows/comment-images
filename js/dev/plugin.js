@@ -37,6 +37,7 @@
 				}
 
                 // check if browser support html5 FILE
+                /*
                 if ( window.FileReader && window.File && window.FileList && window.Blob ){
 
                     // check filesize before upload
@@ -50,10 +51,9 @@
 
                         $( this ).val( '' );
 
-                        return;
-
                     }
                 }
+                */
 			}
 
 		});

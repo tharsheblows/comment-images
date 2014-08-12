@@ -14,7 +14,7 @@
  * Plugin Name: Comment Images
  * Plugin URI:  http://tommcfarlin.com/comment-images/
  * Description: Allow your readers easily to attach an image to their comments on posts and pages.
- * Version:     1.17.0
+ * Version:     1.18.0
  * Author:      Tom McFarlin
  * Author URI:  http://tommcfarlin.com
  * Text Domain: comment-image-locale

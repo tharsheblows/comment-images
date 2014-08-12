@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Comment Images 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-12 17:26-0500\n"
-"PO-Revision-Date: 2013-12-12 17:26-0500\n"
-"Last-Translator: Tom McFarlin <tom@tommcfarlin.com>\n"
+"POT-Creation-Date: 2014-08-12 17:33-0500\n"
+"PO-Revision-Date: 2014-08-12 17:33-0500\n"
+"Last-Translator: Tom McFarlin <tom@pressware.co>\n"
 "Language-Team: Tom McFarlin <tom@tommcfarlin.com>\n"
 "Language: en_US\n"
 "MIME-Version: 1.0\n"
@@ -12,23 +12,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: __;_e\n"
 "X-Poedit-Basepath: .\n"
-"X-Generator: Poedit 1.6.2\n"
+"X-Generator: Poedit 1.6.7\n"
 "X-Poedit-SearchPath-0: ..\n"
 
-#: ../class-comment-image.php:129 ../class-comment-image.php:231
-#: ../class-comment-image.php:476 ../class-comment-image.php:485
+#: ../class-comment-image.php:166 ../class-comment-image.php:268
+#: ../class-comment-image.php:556 ../class-comment-image.php:565
 msgid "Comment Images"
 msgstr ""
 
-#: ../class-comment-image.php:162
+#: ../class-comment-image.php:199
 msgid "View Post Comment Images"
 msgstr ""
 
-#: ../class-comment-image.php:187
+#: ../class-comment-image.php:224
 msgid "Comment Image"
 msgstr ""
 
-#: ../class-comment-image.php:294
+#: ../class-comment-image.php:331
 msgid ""
 "<strong>Comment Images Notice:</strong> Unfortunately, your host does not "
 "allow uploads from the comment form. This plugin will not work for your host."
@@ -40,46 +40,47 @@ msgid ""
 "saved, this image will not display with your comment."
 msgstr ""
 
-#: ../class-comment-image.php:369
+#: ../class-comment-image.php:367
+msgid ""
+"<strong>Heads up!</strong> You are attempting to upload an image that is too "
+"large. If saved, this image will not be uploaded.<br />The maximum file size "
+"is: "
+msgstr ""
+
+#: ../class-comment-image.php:404
+msgid ""
+"By doing this, you will toggle Comment Images for all posts on your blog. "
+"Are you sure you want to do this?"
+msgstr ""
+
+#: ../class-comment-image.php:427
 msgid "Select an image for your comment (GIF, PNG, JPG, JPEG):"
 msgstr ""
 
-#: ../class-comment-image.php:504
+#: ../class-comment-image.php:457
+msgid "Error: Uploaded file is too large. <br/> Go back to: "
+msgstr ""
+
+#: ../class-comment-image.php:584
 msgid "Doing this will only update <strong>this</strong> post."
 msgstr ""
 
-#: ../class-comment-image.php:506
+#: ../class-comment-image.php:586
 msgid "Enable comment images for this post."
 msgstr ""
 
-#: ../class-comment-image.php:507
+#: ../class-comment-image.php:587
 msgid "Disable comment images for this post."
 msgstr ""
 
-#: ../class-comment-image.php:517
+#: ../class-comment-image.php:597
 msgid "Doing this will update <strong>all</strong> posts."
 msgstr ""
 
-#: ../class-comment-image.php:520
+#: ../class-comment-image.php:600
 msgid "Disable Comments For All Posts"
 msgstr ""
 
-#: ../class-comment-image.php:524
+#: ../class-comment-image.php:604
 msgid "Enable Comments For All Posts"
-msgstr ""
-
-#: ../class-comment-image.php:620
-msgid "png"
-msgstr ""
-
-#: ../class-comment-image.php:620
-msgid "gif"
-msgstr ""
-
-#: ../class-comment-image.php:620
-msgid "jpg"
-msgstr ""
-
-#: ../class-comment-image.php:620
-msgid "jpeg"
 msgstr ""
