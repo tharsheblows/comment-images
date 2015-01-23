@@ -3,8 +3,8 @@ Contributors: tommcfarlin
 Donate link: http://tommcfarlin.com/donate/
 Tags: comments, image
 Requires at least: 3.4.1
-Tested up to: 3.9.2
-Stable tag: 1.18.0
+Tested up to: 4.1
+Stable tag: 1.20.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -67,6 +67,9 @@ Same as above :)
 8. The updated 'All Posts' view showing when a post's comments contain comment images
 
 == Changelog ==
+
+= 1.20.0 =
+* Verifying WordPress 4.1 compatibility
 
 = 1.18.0 =
 * Localizing the JavaScript for the dashboard (h/t Вячеслав Колосов)

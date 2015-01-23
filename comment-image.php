@@ -8,13 +8,13 @@
  * @author    Tom McFarlin <tom@tommcfarlin.com>
  * @license   GPL-2.0+
  * @link      http://tommcfarlin.com
- * @copyright 2013 - 2014 Tom McFarlin
+ * @copyright 2013 - 2015 Tom McFarlin
  *
  * @wordpress-plugin
  * Plugin Name: Comment Images
  * Plugin URI:  http://tommcfarlin.com/comment-images/
  * Description: Allow your readers easily to attach an image to their comments on posts and pages.
- * Version:     1.18.0
+ * Version:     1.20.0
  * Author:      Tom McFarlin
  * Author URI:  http://tommcfarlin.com
  * Text Domain: comment-image-locale
