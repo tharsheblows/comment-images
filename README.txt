@@ -1,5 +1,5 @@
 === Comment Images ===
-Contributors: tommcfarlin, idanm
+Contributors: tommcfarlin
 Donate link: http://tommcfarlin.com/donate/
 Tags: comments, image
 Requires at least: 3.4.1
