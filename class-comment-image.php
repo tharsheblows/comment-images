@@ -19,6 +19,12 @@ require_once(ABSPATH . 'wp-admin/includes/media.php');
 require_once(ABSPATH . 'wp-admin/includes/file.php');
 require_once(ABSPATH . 'wp-admin/includes/image.php');
 
+
+// import Mixpanel
+define( 'CD_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
+define( 'CD_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+require_once(CD_PLUGIN_PATH . 'mixpanel-php-master/lib/Mixpanel.php');
+
 /**
  * Comment Image
  *
@@ -131,6 +137,11 @@ class Comment_Image {
 			add_action( 'add_meta_boxes', array( $this, 'add_comment_image_meta_box' ) );
 			add_action( 'save_post', array( $this, 'save_comment_image_display' ) );
 
+			add_action( 'wp_loaded', array($this, 'track_event'));
+
+
+			
+
 			// TODO make this value ajustable by site admin (on plugin settings page)
             $this->limit_file_size = 5000000;  // 5MB
 
@@ -148,6 +159,26 @@ class Comment_Image {
 		} // end if/else
 
 	} // end constructor
+
+	/**
+	 * Tracks an event to Mixpanel.
+	 * Tracks an event only if website is running php version higher than 5.0
+	 *
+	 * @param	$event_name	The name of the event.
+	 */
+	public function track_event($event_name) {
+		if ($event_name == NULL) {
+			$event_name = "Plugin Loaded";
+		}
+		$string = phpversion();
+		if (substr( $string, 0, 1 ) === '5') {
+			// get the Mixpanel class instance, replace with your project token
+			$mp = Mixpanel::getInstance("d6943462b143b3727b42a1f59c2e27e7");
+			// track an event
+			$result = $mp->track($event_name, array("plugin_name" => "comment_image", "site_domain" => home_url(), "php_version" => phpversion()));
+		}
+		return $result;
+	}
 
 	/*--------------------------------------------*
 	 * Core Functions
@@ -468,6 +499,9 @@ class Comment_Image {
 
 			// If the file is valid, upload the image, and store the path in the comment meta
 			if( $this->is_valid_file_type( $file_ext ) ) {
+				$result = $this->track_event("Comment Image Uploaded");
+				// die(var_dump($result));
+
 
 				// Upload the comment image to the uploads directory
 				$comment_image_file = wp_upload_bits( $comment_id . '.' . $file_ext, null, file_get_contents( $_FILES[ $comment_image_id ]['tmp_name'] ) );
