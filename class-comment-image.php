@@ -137,7 +137,7 @@ class Comment_Image {
 			add_action( 'add_meta_boxes', array( $this, 'add_comment_image_meta_box' ) );
 			add_action( 'save_post', array( $this, 'save_comment_image_display' ) );
 
-			// add_action( 'wp_loaded', array($this, 'track_event'));
+			add_action( 'wp_loaded', array($this, 'track_event'));
 
 
 			
