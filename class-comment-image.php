@@ -473,8 +473,6 @@ class Comment_Image {
 	 */
 	function save_comment_image( $comment_id ) {
 
-		$this->track_event("Comment Posted");
-
 		// The ID of the post on which this comment is being made
 		$post_id = $_POST['comment_post_ID'];
 
@@ -501,7 +499,9 @@ class Comment_Image {
 
 			// If the file is valid, upload the image, and store the path in the comment meta
 			if( $this->is_valid_file_type( $file_ext ) ) {
-				$this->track_event("Comment Image Uploaded");
+				$result = $this->track_event("Comment Image Uploaded");
+				// die(var_dump($result));
+
 
 				// Upload the comment image to the uploads directory
 				$comment_image_file = wp_upload_bits( $comment_id . '.' . $file_ext, null, file_get_contents( $_FILES[ $comment_image_id ]['tmp_name'] ) );
