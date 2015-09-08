@@ -68,9 +68,6 @@ Same as above :)
 
 == Changelog ==
 
-= 1.23.0 =
-* Bug Fixes
-
 = 1.20.0 =
 * Verifying WordPress 4.1 compatibility
 
