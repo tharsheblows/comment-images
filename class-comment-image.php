@@ -343,7 +343,7 @@ class Comment_Image {
 
 		if( is_single() || is_page() ) {
 
-			wp_register_style( 'comment-images', plugins_url( '/comment-images/css/plugin.css' ) );
+			wp_register_style( 'comment-images', plugins_url( 'css/comment-images.css', __FILE__ ) );
 			wp_enqueue_style( 'comment-images' );
 
 		} // end if
@@ -355,9 +355,11 @@ class Comment_Image {
 	 */
 	function add_scripts() {
 
+		$suffix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
+
 		if( is_single() || is_page() ) {
 
-			wp_register_script( 'comment-images', plugins_url( '/comment-images/js/plugin.min.js' ), array( 'jquery' ) );
+			wp_register_script( 'comment-images', plugins_url( "js/comment-images$suffix.js", __FILE__ ), array( 'jquery' ) );
 
             wp_localize_script(
             	'comment-images',
@@ -382,7 +384,7 @@ class Comment_Image {
 
 		$screen = get_current_screen();
 		if( 'post' === $screen->id || 'page' == $screen->id ) {
-			wp_enqueue_style( 'comment-images-admin', plugins_url( '/comment-images/css/admin.css' ) );
+			wp_enqueue_style( 'comment-images-admin', plugins_url( 'css/comment-images-admin.css', __FILE__ ) );
 		} // end if
 
 	} // end add_admin_styles
@@ -392,10 +394,12 @@ class Comment_Image {
 	 */
 	function add_admin_scripts() {
 
+		$suffix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
+
 		$screen = get_current_screen();
 		if( 'post' === $screen->id || 'page' == $screen->id ) {
 
-			wp_register_script( 'comment-images-admin', plugins_url( '/comment-images/js/admin.min.js' ), array( 'jquery' ) );
+			wp_register_script( 'comment-images-admin', plugins_url( "js/comment-images-admin$suffix.js", __FILE__ ), array( 'jquery' ) );
 
             wp_localize_script(
             	'comment-images-admin',
@@ -418,6 +422,8 @@ class Comment_Image {
 	 */
  	function add_image_upload_form( $post_id ) {
 
+ 		$comment_image_nonce_field = wp_create_nonce( 'comment_image_' . $post_id );
+
 	 	// Create the label and the input field for uploading an image
 	 	if ( 'disabled' != get_option( 'comment_image_toggle_state' ) && 'disable' != get_post_meta( $post_id, 'comment_images_toggle', true ) ) {
 
@@ -427,6 +433,7 @@ class Comment_Image {
 				 	$html .= __( 'Select an image for your comment (GIF, PNG, JPG, JPEG):', 'comment-images' );
 				 $html .= "</label>";
 				 $html .= "<input type='file' name='comment_image_$post_id' id='comment_image' />";
+				 $html .= "<input type='hidden' name='comment_image_nonce' value='$comment_image_nonce_field' />";
 			 $html .= '</div><!-- #comment-image-wrapper -->';
 
 			 echo $html;
@@ -448,12 +455,19 @@ class Comment_Image {
 		// The key ID of the comment image
 		$comment_image_id = "comment_image_$post_id";
 
-		// If the nonce is valid and the user uploaded an image, let's upload it to the server
+		// If the commenter uploaded an image, let's go
 		if( isset( $_FILES[ $comment_image_id ] ) && ! empty( $_FILES[ $comment_image_id ] ) ) {
 
-            // disable save files larger than $limit_filesize
+			// If the nonce fails, bail.
+			if ( ! wp_verify_nonce( $_POST['comment_image_nonce'], 'comment_image_' . $post_id ) ) {
+			    // This nonce is not valid. Edit this to be a bit nicer.
+			    die( 'The security check has failed.' );
+			}
+
+            // Don't save files larger than $limit_filesize
             if ( $this->limit_file_size < $_FILES[ $comment_image_id ]['size'] ) {
 
+            	// Edit this to be a bit nicer.
                 echo __( "Error: Uploaded file is too large. <br/> Go back to: ", 'comment-images' );
                 echo '<a href="' . get_permalink( $post_id ) . '">' . get_the_title( $post_id ) . '</a>';
                 die;
@@ -518,11 +532,24 @@ class Comment_Image {
 			// Loop through each comment...
 			foreach( $comments as $comment ) {
 
-				// ...and if the comment has a comment image...
-				if( true == get_comment_meta( $comment->comment_ID, 'comment_image' ) ) {
+				$comment_id = $comment->comment_ID;
 
-					// ...get the comment image meta
-					$comment_image = get_comment_meta( $comment->comment_ID, 'comment_image', true );
+				// ...get the comment image meta
+				$comment_image = get_comment_meta( $comment_id, 'comment_image', true );
+
+				// ...and if the comment has a comment image...
+				if( !empty( $comment_image ) ) {
+
+					// These will be used to for the srcset and sizes in images. If the RICG plugin isn't included, they are not there.
+					$sizes = '';
+					$srcset = '';
+
+					if( function_exists( 'tevkori_get_sizes_string' ) && function_exists( 'tevkori_get_srcset_string' ) ){
+						$sizes = tevkori_get_sizes_string( $comment_id );
+						$srcset = tevkori_get_srcset_string( $comment_id );
+					}
+
+
 
 					// ...and render it in a paragraph element appended to the comment
 					$comment->comment_content .= '<p class="comment-image">';
@@ -597,11 +624,11 @@ class Comment_Image {
 		 $html .= '<p class="comment-image-warning">' . __( 'Doing this will update <strong>all</strong> posts.', 'comment-images' ) . '</p>';
 		 if( 'enabled' == $comment_image_state ) {
 
-			 $html .= '<input type="button" class="button" name="comment_image_toggle" id="comment_image_toggle" value="' . __( 'Disable Comments For All Posts', 'comment-images' ) . '"/>';
+			 $html .= '<input type="button" class="button" name="comment_image_toggle" id="comment_image_toggle" value="' . __( 'Disable Comment Images For All Posts', 'comment-images' ) . '"/>';
 
 		 } else {
 
-			 $html .= '<input type="button" class="button" name="comment_image_toggle" id="comment_image_toggle" value="' . __( 'Enable Comments For All Posts', 'comment-images' ) . '"/>';
+			 $html .= '<input type="button" class="button" name="comment_image_toggle" id="comment_image_toggle" value="' . __( 'Enable Comment Images For All Posts', 'comment-images' ) . '"/>';
 
 		 } // end if/else
 
@@ -744,6 +771,6 @@ class Comment_Image {
  *		- User's shouldn't have to enter text to leave a comment.
  *
  *	+ Bugs
- * 		- Warning: file_get_contents() [function.file-get-contents]: Filename cannot be empty in /home/[masked]/public_html/wp-content/plugins/comment-images/plugin.php on line 199
+ * 		- Warning: file_get_contents() [function.file-get-contents]: Filename cannot be empty in /home/[masked]/public_html/wp-content/plugins/mjj-comment-images/plugin.php on line 199
  *		- I actually tested the plugin on my original enquiry and it appears that the images actually get *removed* from the comments when the plugin is disabled.
  */
