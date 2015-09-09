@@ -552,7 +552,6 @@ class Comment_Image {
 						$srcset = tevkori_get_srcset_string( $comment_image_id, 'large' );
 					}
 
-					print_r( wp_get_attachment_metadata( $comment_image_id ) );
 					// ...and render it in a paragraph element appended to the comment
 					$comment->comment_content .= '<p class="comment-image">';
 						$comment->comment_content .= '<img src="' . $comment_image_url . '" ' . $sizes . ' ' . $srcset . ' />';
