@@ -480,22 +480,19 @@ class Comment_Image {
             // Get file ext.
             $file_ext = $file_name_parts[ count( $file_name_parts ) - 1 ];
 
-			// If the file is valid, upload the image, and store the path in the comment meta
+			// If the file is valid, upload the image and save the url and image id
 			if( $this->is_valid_file_type( $file_ext ) ) {
 
 				// Upload the comment image to the uploads directory
-				$comment_image_file = wp_upload_bits( $comment_id . '.' . $file_ext, null, file_get_contents( $_FILES[ $comment_image_id ]['tmp_name'] ) );
+				$comment_image_uploaded_id = media_handle_upload( $comment_image_id, $post_id );
 
-				// Now, we need to actually create a post so that this shows up in the media uploader
-				$img_url = media_sideload_image( $comment_image_file['url'], $post_id );
+				// Set the url
+				$comment_image_file['url'] = wp_get_attachment_url( $comment_image_uploaded_id );
+				// This is the image ID which we'll use in displaying it
+				$comment_image_file['comment_image_id'] = $comment_image_uploaded_id;
 
-				// And strip out the name of the image file so we can save this to the meta data
-				// Regex is usually bad for this, but WordPress is predictable in the format
-				preg_match_all( "#[^<img src='](.*)[^'alt='' />]#", $img_url, $matches );
-				$comment_image_file['url'] = $matches[0][0];
-
-				// Set post meta about this image. Need the comment ID and need the path.
-				if( FALSE === $comment_image_file['error'] ) {
+				// Set post meta about this image. (The $comment_image_file array)
+				if( ! is_wp_error( $$comment_image_uploaded_id) ) {
 
 					// Since we've already added the key for this, we'll just update it with the file.
 					add_comment_meta( $comment_id, 'comment_image', $comment_image_file );
@@ -540,20 +537,25 @@ class Comment_Image {
 				// ...and if the comment has a comment image...
 				if( !empty( $comment_image ) ) {
 
+					$comment_image_id = (int)$comment_image['comment_image_id'];
+					$comment_image_url = esc_url( $comment_image['url'] );
+
 					// These will be used to for the srcset and sizes in images. If the RICG plugin isn't included, they are not there.
 					$sizes = '';
 					$srcset = '';
 
+					// TODO should these sizes be able to be set? Hmm, let me think about this.
+					// This is used to create the sizes and srcset attributes if the RICG plugin is activated:
+					// https://github.com/ResponsiveImagesCG/wp-tevko-responsive-images
 					if( function_exists( 'tevkori_get_sizes_string' ) && function_exists( 'tevkori_get_srcset_string' ) ){
-						$sizes = tevkori_get_sizes_string( $comment_id );
-						$srcset = tevkori_get_srcset_string( $comment_id );
+						$sizes = tevkori_get_sizes_string( $comment_image_id, 'large' );
+						$srcset = tevkori_get_srcset_string( $comment_image_id, 'large' );
 					}
 
-
-
+					print_r( wp_get_attachment_metadata( $comment_image_id ) );
 					// ...and render it in a paragraph element appended to the comment
 					$comment->comment_content .= '<p class="comment-image">';
-						$comment->comment_content .= '<img src="' . $comment_image['url'] . '" alt="" />';
+						$comment->comment_content .= '<img src="' . $comment_image_url . '" ' . $sizes . ' ' . $srcset . ' />';
 					$comment->comment_content .= '</p><!-- /.comment-image -->';
 
 				} // end if
@@ -765,12 +767,9 @@ class Comment_Image {
  * Backlog
  *
  *  + Features
- *		- P2 Compatibility
- *		- JetPack compatibility
  *		- Is there a way to re-size the images before uploading?
- *		- User's shouldn't have to enter text to leave a comment.
+ *		- Users shouldn't have to enter text to leave a comment.
  *
  *	+ Bugs
- * 		- Warning: file_get_contents() [function.file-get-contents]: Filename cannot be empty in /home/[masked]/public_html/wp-content/plugins/mjj-comment-images/plugin.php on line 199
  *		- I actually tested the plugin on my original enquiry and it appears that the images actually get *removed* from the comments when the plugin is disabled.
  */
