@@ -460,14 +460,14 @@ class Comment_Image {
 
 			// If the nonce fails, bail.
 			if ( ! wp_verify_nonce( $_POST['comment_image_nonce'], 'comment_image_' . $post_id ) ) {
-			    // This nonce is not valid. Edit this to be a bit nicer.
+			    // TODO This nonce is not valid. Edit this to be a bit nicer.
 			    die( 'The security check has failed.' );
 			}
 
             // Don't save files larger than $limit_filesize
             if ( $this->limit_file_size < $_FILES[ $comment_image_id ]['size'] ) {
 
-            	// Edit this to be a bit nicer.
+            	// TODO Edit this to be a bit nicer.
                 echo __( "Error: Uploaded file is too large. <br/> Go back to: ", 'comment-images' );
                 echo '<a href="' . get_permalink( $post_id ) . '">' . get_the_title( $post_id ) . '</a>';
                 die;
@@ -499,7 +499,7 @@ class Comment_Image {
 
 				} // end if/else
 
-                // Send comment to approval if this option checked by admin
+                // TODO: This doesn't do anything. Send comment to approval if this option checked by admin
                 if ( TRUE === $this->needs_to_approve ) {
 
                     $commentarr = array();
