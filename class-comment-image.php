@@ -1,11 +1,9 @@
 <?php
 /**
- * Comment Image
+ * MJJ Comment Image
  *
- * @package   Comment_Image
- * @author    Tom McFarlin <tom@tommcfarlin.com>
+ * @author    JJ forked from Tom McFarlin's Comment Images plugin
  * @license   GPL-2.0+
- * @link      http://tommcfarlin.com
  * @copyright 2013 - 2015 Tom McFarlin
  */
 
@@ -22,10 +20,9 @@ require_once(ABSPATH . 'wp-admin/includes/image.php');
 /**
  * Comment Image
  *
- * @package Comment_Image
- * @author  Tom McFarlin <tom@tommcfarlin.com>
+ * @author  JJ forked from Tom McFarlin's Comment Images plugin
  */
-class Comment_Image {
+class MJJ_Comment_Image {
 
 	/*--------------------------------------------*
 	 * Constructor
@@ -555,7 +552,7 @@ class Comment_Image {
 					// ...and render it in a paragraph element appended to the comment
 					$comment->comment_content .= '<p class="comment-image">';
 						$comment->comment_content .= '<img src="' . $comment_image_url . '" ' . $sizes . ' ' . $srcset . ' />';
-					$comment->comment_content .= '</p><!-- /.comment-image -->';
+					$comment->comment_content .= '</p>';
 
 				} // end if
 
