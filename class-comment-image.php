@@ -112,7 +112,7 @@ class MJJ_Comment_Image {
 			//add_action( 'comment_form' , array( $this, 'add_image_upload_form' ) );
 			add_filter( 'comment_form_submit_field', array( $this, 'add_image_upload_fields'), 10, 2 );
 			add_action( 'wp_insert_comment', array( $this, 'save_the_comment_image' ), 10, 2 );
-			add_filter( 'comments_array', array( $this, 'display_comment_image' ) );
+			add_filter( 'comment_text', array( $this, 'display_comment_image' ) );
 
 			// Add a note to recent comments that they have Comment Images
 			add_filter( 'comment_row_actions', array( $this, 'recent_comment_has_image' ), 20, 2 );
@@ -452,85 +452,13 @@ class MJJ_Comment_Image {
 		/// try adding it here -- this is a filter
 	}
 
+
 	/**
-	 * Adds the comment image upload form to the comment form.
-	 *
-	 * @param	$comment_id	The ID of the comment to which we're adding the image.
-	 */
-	function save_comment_image( $comment_id ) {
-
-		// The ID of the post on which this comment is being made
-		$post_id = $_POST['comment_post_ID'];
-
-		// The key ID of the comment image
-		$comment_image_id = "comment_image_$post_id";
-
-		// If the commenter uploaded an image, let's go
-		if( isset( $_FILES[ $comment_image_id ] ) && ! empty( $_FILES[ $comment_image_id ] ) ) {
-
-			// If the nonce fails, bail.
-			if ( ! wp_verify_nonce( $_POST['comment_image_nonce'], 'comment_image_' . $post_id ) ) {
-			    // TODO This nonce is not valid. Edit this to be a bit nicer.
-			    die( 'The security check has failed.' );
-			}
-
-            // Don't save files larger than $limit_filesize
-            if ( $this->limit_file_size < $_FILES[ $comment_image_id ]['size'] ) {
-
-            	// TODO Edit this to be a bit nicer.
-                echo __( "Error: Uploaded file is too large. <br/> Go back to: ", 'comment-images' );
-                echo '<a href="' . get_permalink( $post_id ) . '">' . get_the_title( $post_id ) . '</a>';
-                die;
-
-            }
-
-			// Store the parts of the file name into an array
-			$file_name_parts = explode( '.', $_FILES[ $comment_image_id ]['name'] );
-
-            // Get file ext.
-            $file_ext = $file_name_parts[ count( $file_name_parts ) - 1 ];
-
-			// If the file is valid, upload the image and save the url and image id
-			if( $this->is_valid_file_type( $file_ext ) ) {
-
-				// Upload the comment image to the uploads directory
-				$comment_image_uploaded_id = media_handle_upload( $comment_image_id, $post_id );
-
-				// Set the url
-				$comment_image_file['url'] = wp_get_attachment_url( $comment_image_uploaded_id );
-				// This is the image ID which we'll use in displaying it
-				$comment_image_file['comment_image_id'] = $comment_image_uploaded_id;
-
-				// Set post meta about this image. (The $comment_image_file array)
-				if( ! is_wp_error( $$comment_image_uploaded_id) ) {
-
-					// Since we've already added the key for this, we'll just update it with the file.
-					add_comment_meta( $comment_id, 'comment_image', $comment_image_file );
-
-				} // end if/else
-
-                // TODO: This doesn't do anything. Send comment to approval if this option checked by admin
-                if ( TRUE === $this->needs_to_approve ) {
-
-                    $commentarr = array();
-                    $commentarr['comment_ID'] = $comment_id;
-                    $commentarr['comment_approved'] = 0;
-
-                    wp_update_comment( $commentarr );
-
-                }
-
-			} // end if
-
-		} // end if
-
-	} // end save_comment_image
-
-/**
-	 * Handles uploading a file to a WordPress comment
+	 * Handles uploading a file to a WordPress comment. This is very similar to the bsf theme functionality.
 	 *
 	 * @param  int   $post_id              Post ID to upload the photo to
 	 * @param  array $attachment_post_data Attachement post-data array
+	 *
 	 */
 	public function save_the_comment_image( $comment_id, $comment, $is_edit = 'no', $current_thumbnail_id = 0, $image_cleared = 'no' ) {
 
@@ -583,11 +511,13 @@ class MJJ_Comment_Image {
 		add_filter('sanitize_file_name', function( $filename, $renamed_file ){
 			$info = pathinfo( $renamed_file );
     		$ext  = empty( $info['extension']) ? '' : '.' . $info['extension'];
-    		$name = basename( $renamed_file , $ext ) . 'recipe_image';
+    		$name = basename( $renamed_file , $ext ) . 'comment_image';
     		return substr( md5( $name ), 0, 8 ) . $ext; }, 10, 2);
 
+		$post_data['post_title'] = 'Comment ' . $comment_id . ' image';
+
 		// Upload the file and send back the attachment post ID
-		$comment_image_uploaded_id = media_handle_upload( $comment_image_id, $post_id );
+		$comment_image_uploaded_id = media_handle_upload( $comment_image_id, $post_id, $post_data );
 
 		// Set the url
 		$comment_image_file['url'] = wp_get_attachment_url( $comment_image_uploaded_id );
@@ -609,45 +539,35 @@ class MJJ_Comment_Image {
 	 *
 	 * @param	$comment	The content of the comment.
 	 */
-	function display_comment_image( $comments ) {
+	function display_comment_image( $comment_text, $comment, $args ) {
 
-		// Make sure that there are comments
-		if( count( $comments ) > 0 ) {
+		$comment_id = $comment->comment_ID;
 
-			// Loop through each comment...
-			foreach( $comments as $comment ) {
+		// ...get the comment image meta
+		$comment_image = get_comment_meta( $comment_id, 'comment_image', true );
 
-				$comment_id = $comment->comment_ID;
+		// ...and if the comment has a comment image...
+		if( !empty( $comment_image ) ) {
 
-				// ...get the comment image meta
-				$comment_image = get_comment_meta( $comment_id, 'comment_image', true );
+			$comment_image_id = (int)$comment_image['comment_image_id'];
+			$comment_image_url = esc_url( $comment_image['url'] );
 
-				// ...and if the comment has a comment image...
-				if( !empty( $comment_image ) ) {
+			// These will be used to for the srcset and sizes in images. If the RICG plugin isn't included, they are not there.
+			$sizes = '';
+			$srcset = '';
 
-					$comment_image_id = (int)$comment_image['comment_image_id'];
-					$comment_image_url = esc_url( $comment_image['url'] );
+			// TODO should these sizes be able to be set? Hmm, let me think about this.
+			// This is used to create the sizes and srcset attributes if the RICG plugin is activated:
+			// https://github.com/ResponsiveImagesCG/wp-tevko-responsive-images
+			if( function_exists( 'tevkori_get_sizes_string' ) && function_exists( 'tevkori_get_srcset_string' ) ){
+				$sizes = tevkori_get_sizes_string( $comment_image_id, 'large' );
+				$srcset = tevkori_get_srcset_string( $comment_image_id, 'large' );
+			}
 
-					// These will be used to for the srcset and sizes in images. If the RICG plugin isn't included, they are not there.
-					$sizes = '';
-					$srcset = '';
-
-					// TODO should these sizes be able to be set? Hmm, let me think about this.
-					// This is used to create the sizes and srcset attributes if the RICG plugin is activated:
-					// https://github.com/ResponsiveImagesCG/wp-tevko-responsive-images
-					if( function_exists( 'tevkori_get_sizes_string' ) && function_exists( 'tevkori_get_srcset_string' ) ){
-						$sizes = tevkori_get_sizes_string( $comment_image_id, 'large' );
-						$srcset = tevkori_get_srcset_string( $comment_image_id, 'large' );
-					}
-
-					// ...and render it in a paragraph element appended to the comment
-					$comment->comment_content .= '<p class="comment-image">';
-						$comment->comment_content .= '<img src="' . $comment_image_url . '" ' . $sizes . ' ' . $srcset . ' />';
-					$comment->comment_content .= '</p>';
-
-				} // end if
-
-			} // end foreach
+			// ...and render it in a paragraph element appended to the comment
+			$comment->comment_content .= '<p class="comment-image">';
+				$comment->comment_content .= '<img src="' . $comment_image_url . '" ' . $sizes . ' ' . $srcset . ' />';
+			$comment->comment_content .= '</p>';
 
 		} // end if
 

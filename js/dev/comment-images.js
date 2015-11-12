@@ -4,6 +4,11 @@ jQuery( document ).ready( function ($){
 
 	'use strict';
 
+	// If the comment form is visible, set it's enctype to support uploading files
+	if ( 0 < $( '#commentform' ).length ) {
+		$( '#commentform' ).attr( 'enctype', 'multipart/form-data' );
+	}
+
 	// for http://stackoverflow.com/questions/25095863/how-to-detect-file-extension-with-javascript-filereader
 	var allowedCommentImageTypes = ['jpg', 'jpeg', 'png', 'gif'];  //acceptable file types
 	var uploadCommentImageBackground = '/src/wp-content/themes/bloodsugarfix/images/dist/recipe-images/fork-knife-plate.png';
@@ -18,8 +23,7 @@ jQuery( document ).ready( function ($){
     	commentImagesClearImageUpload( this );
 	});
 
-
-	//http://stackoverflow.com/questions/4459379/preview-an-image-before-it-is-uploaded/4459419#4459419
+	// http://stackoverflow.com/questions/4459379/preview-an-image-before-it-is-uploaded/4459419#4459419
 	// this is pretty much duplicated from the bsf theme but in the interest of completeness I'm putting it here
 	function commentImagesDisplayPreview( input ) {
 
@@ -43,8 +47,7 @@ jQuery( document ).ready( function ($){
 	    	    	reader.readAsDataURL(input.files[0]);
 	    	    }
 	    	    else{
-	    	    	$( input ).attr( 'value', '' );
-	    	    	//commentImagesClearImageUpload( clear_this );
+	    	    	commentImagesClearImageUpload( clear_this );
 	    	    	alert( 'You may only uploads images of types jpg, png or gif and they must be less than 2MB.' );
 	    	    }
 
