@@ -112,7 +112,7 @@ class MJJ_Comment_Image {
 			//add_action( 'comment_form' , array( $this, 'add_image_upload_form' ) );
 			add_filter( 'comment_form_submit_field', array( $this, 'add_image_upload_fields'), 10, 2 );
 			add_action( 'wp_insert_comment', array( $this, 'save_the_comment_image' ), 10, 2 );
-			add_filter( 'comment_text', array( $this, 'display_comment_image' ) );
+			add_filter( 'comment_text', array( $this, 'display_comment_image' ), 10, 3 );
 
 			// Add a note to recent comments that they have Comment Images
 			add_filter( 'comment_row_actions', array( $this, 'recent_comment_has_image' ), 20, 2 );
@@ -553,25 +553,21 @@ class MJJ_Comment_Image {
 			$comment_image_url = esc_url( $comment_image['url'] );
 
 			// These will be used to for the srcset and sizes in images. If the RICG plugin isn't included, they are not there.
-			$sizes = '';
-			$srcset = '';
+			$img_sizes = $img_srcset = $img_src = '';
 
-			// TODO should these sizes be able to be set? Hmm, let me think about this.
-			// This is used to create the sizes and srcset attributes if the RICG plugin is activated:
-			// https://github.com/ResponsiveImagesCG/wp-tevko-responsive-images
-			if( function_exists( 'tevkori_get_sizes_string' ) && function_exists( 'tevkori_get_srcset_string' ) ){
-				$sizes = tevkori_get_sizes_string( $comment_image_id, 'large' );
-				$srcset = tevkori_get_srcset_string( $comment_image_id, 'large' );
-			}
+			$img_src = wp_get_attachment_image_url( $comment_image_id, 'large' );
+			$img_srcset = wp_get_attachment_image_srcset( $comment_image_id, 'large' );
+			$img_sizes = wp_get_attachment_image_sizes( $comment_image_id, 'large' );
 
 			// ...and render it in a paragraph element appended to the comment
-			$comment->comment_content .= '<p class="comment-image">';
-				$comment->comment_content .= '<img src="' . $comment_image_url . '" ' . $sizes . ' ' . $srcset . ' />';
-			$comment->comment_content .= '</p>';
+			$comment_text .= '<p class="comment-image">';
+				$comment_text .= '<img src="' . esc_url( $img_src ) . '" srcset="' . esc_attr( $img_srcset ) . '" sizes="' . esc_attr( $img_sizes ) . '" />';
+			$comment_text .= '</p>';
+
 
 		} // end if
 
-		return $comments;
+		return $comment_text;
 
 	} // end display_comment_image
 
