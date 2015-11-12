@@ -1,63 +1,65 @@
-(function( $ ) {
+/*! MJJ Comment Images - v0.1.0 - 2015-11-10
+ * Copyright (c) 2015; * Licensed GPLv2+ */
+jQuery( document ).ready( function ($){
+
 	'use strict';
 
-	$(function() {
+	// for http://stackoverflow.com/questions/25095863/how-to-detect-file-extension-with-javascript-filereader
+	var allowedCommentImageTypes = ['jpg', 'jpeg', 'png', 'gif'];  //acceptable file types
+	var uploadCommentImageBackground = '/src/wp-content/themes/bloodsugarfix/images/dist/recipe-images/fork-knife-plate.png';
 
-		// If the comment form is visible, set it's enctype to support uploading files
-		if ( 0 < $('#commentform').length ) {
-			$( '#commentform' ).attr( 'enctype', 'multipart/form-data' );
-		}
 
-		// Setup an event handler so we can notify the user whether or not the file type is valid
-		$( '#comment_image' ).change(function () {
-
-			// If the file isn't empty, verify it's a valid file
-			if ( '' !== $.trim( $(this).val() ) ) {
-
-				var aFileName, sFileType;
-
-				aFileName = $(this).val().split( '.' );
-				sFileType = aFileName[ aFileName.length - 1 ].toString().toLowerCase();
-
-				if ( 'png' === sFileType || 'gif' === sFileType || 'jpg' === sFileType || 'jpeg' === sFileType ) {
-					$( '#comment-image-error' ).hide();
-				} else {
-
-                    // show localised error message
-					$( '#comment-image-error' )
-						.html( cm_imgs.fileTypeError )
-						.show();
-
-                    // clear file upload input value
-                    $( this ).val( '' );
-
-                    // return to prevent hide message by next checks
-                    return;
-
-				}
-
-                // check if browser support html5 FILE
-                /*
-                if ( window.FileReader && window.File && window.FileList && window.Blob ){
-
-                    // check filesize before upload
-                    if( cm_imgs.limitFileSize > this.files[0].size ){
-                        $( '#comment-image-error' ).hide();
-                    } else {
-
-                        $( '#comment-image-error' )
-                        	.html( cm_imgs.fileSizeError + ( parseInt( cm_imgs.limitFileSize / 1024 ) ) + 'kb' )
-                        	.show();
-
-                        $( this ).val( '' );
-
-                    }
-                }
-                */
-			}
-
-		});
-
+	$( '.commment-image-wrapper' ).on( 'change', 'input[type="file"].mjj-file-upload-box ', function(){
+    	commentImagesDisplayPreview( this );
 	});
 
-})( jQuery );
+	$( '.commment-image-wrapper' ).on( 'click', 'a.clear_image_upload', function( e ){
+		e.preventDefault();
+    	commentImagesClearImageUpload( this );
+	});
+
+
+	//http://stackoverflow.com/questions/4459379/preview-an-image-before-it-is-uploaded/4459419#4459419
+	// this is pretty much duplicated from the bsf theme but in the interest of completeness I'm putting it here
+	function commentImagesDisplayPreview( input ) {
+
+		var clear_this = $( input ).parent().find( 'a.clear_image_upload' );
+
+		if( window.FileReader !== undefined ){
+			// This requires FileReader API so test for FileReader
+	    	if (input.files && input.files[0] ) {
+
+	    	    var reader = new FileReader();
+
+	    	    var extension = input.files[0].name.split('.').pop().toLowerCase();
+	    	    var isOK = allowedCommentImageTypes.indexOf(extension) > -1;
+	    	    var notTooBig = input.files[0].size < 2000000;
+
+	    	    if( isOK && notTooBig ){
+	    	    	reader.onload = function (e) {
+	    	    	    $( input ).css({ 'background-image': 'url(' + e.target.result + ')', 'background-size': 'auto 90%'});
+	    	    	}
+
+	    	    	reader.readAsDataURL(input.files[0]);
+	    	    }
+	    	    else{
+	    	    	$( input ).attr( 'value', '' );
+	    	    	//commentImagesClearImageUpload( clear_this );
+	    	    	alert( 'You may only uploads images of types jpg, png or gif and they must be less than 2MB.' );
+	    	    }
+
+	    	}
+	    	else{
+	    		$( input ).css({ 'background-image': 'url(' + uploadCommentImageBackground + ')', 'background-size': 'auto 230px'});
+	    	}
+		}
+
+	}
+
+	// need a clear image function https://css-tricks.com/snippets/jquery/clear-a-file-input/
+	function commentImagesClearImageUpload( input ){
+		var imageToClear = $( input ).attr( 'data-clear' );
+		$( '#' + imageToClear ).replaceWith( $( '#' + imageToClear ).css({'val': '', 'background-image': 'url(' + uploadCommentImageBackground + ')'}).clone(true) );
+	}
+
+});

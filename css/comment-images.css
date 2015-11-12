@@ -3,6 +3,7 @@
 #comment-image-wrapper {
   width: 100%;
   clear: both;
+  float: left;
 }
 #comment-image-wrapper label {
   display: block;

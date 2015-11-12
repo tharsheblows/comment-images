@@ -8,7 +8,7 @@
  */
 
 /**
- * Include dependencies necessary for adding Comment Images to the Media Uplower
+ * Include dependencies necessary for adding Comment Images to the Media Uploader
  *
  * See also:	http://codex.wordpress.org/Function_Reference/media_sideload_image
  * @since		1.8
@@ -109,8 +109,9 @@ class MJJ_Comment_Image {
 			add_action( 'admin_enqueue_scripts', array( $this, 'add_admin_scripts' ) );
 
 			// Add the Upload input to the comment form
-			add_action( 'comment_form' , array( $this, 'add_image_upload_form' ) );
-			add_filter( 'wp_insert_comment', array( $this, 'save_comment_image' ) );
+			//add_action( 'comment_form' , array( $this, 'add_image_upload_form' ) );
+			add_filter( 'comment_form_submit_field', array( $this, 'add_image_upload_fields'), 10, 2 );
+			add_action( 'wp_insert_comment', array( $this, 'save_the_comment_image' ), 10, 2 );
 			add_filter( 'comments_array', array( $this, 'display_comment_image' ) );
 
 			// Add a note to recent comments that they have Comment Images
@@ -358,16 +359,6 @@ class MJJ_Comment_Image {
 
 			wp_register_script( 'comment-images', plugins_url( "js/comment-images$suffix.js", __FILE__ ), array( 'jquery' ) );
 
-            wp_localize_script(
-            	'comment-images',
-            	'cm_imgs',
-            	array(
-                	'fileTypeError' => __( '<strong>Heads up!</strong> You are attempting to upload an invalid image. If saved, this image will not display with your comment.', 'comment-images' ),
-					'fileSizeError' => __( '<strong>Heads up!</strong> You are attempting to upload an image that is too large. If saved, this image will not be uploaded.<br />The maximum file size is: ', 'comment-images' ),
-					'limitFileSize' => $this->limit_file_size
-				)
-			);
-
 			wp_enqueue_script( 'comment-images' );
 
 		} // end if
@@ -417,27 +408,49 @@ class MJJ_Comment_Image {
 	 *
 	 * @param	$post_id	The ID of the post on which the comment is being added.
 	 */
- 	function add_image_upload_form( $post_id ) {
+ 	private function add_image_upload_form( $post_id = false, $comment_id = false ) {
+
+ 		if( ! $post_id ){
+ 			$post_id = get_the_ID();
+ 		}
+
+ 		if( ! $post_id ){
+ 			return;
+ 		}
+
+ 		$comment_input_name = ( $comment_id ) ? $comment_id . '_' : '';
 
  		$comment_image_nonce_field = wp_create_nonce( 'comment_image_' . $post_id );
 
 	 	// Create the label and the input field for uploading an image
 	 	if ( 'disabled' != get_option( 'comment_image_toggle_state' ) && 'disable' != get_post_meta( $post_id, 'comment_images_toggle', true ) ) {
 
-		 	$html = '<div id="comment-image-wrapper">';
-			 	$html .= '<p id="comment-image-error"></p>';
-				 $html .= "<label for='comment_image_$post_id'>";
-				 	$html .= __( 'Select an image for your comment (GIF, PNG, JPG, JPEG):', 'comment-images' );
-				 $html .= "</label>";
-				 $html .= "<input type='file' name='comment_image_$post_id' id='comment_image' />";
-				 $html .= "<input type='hidden' name='comment_image_nonce' value='$comment_image_nonce_field' />";
-			 $html .= '</div><!-- #comment-image-wrapper -->';
+			$new_image_input  = '<div class="commment-image-wrapper"><label for="comment_' . $comment_input_name . 'image_' . $post_id . '">Upload an image</label>';
+			$new_image_input .= '<input type="file" class="mjj-file-upload-box" name="comment_' . $comment_input_name . 'image_' . $post_id .'" id="comment_' . $comment_input_name . 'image_' . $post_id .'">';
+			$new_image_input .= '<input type="hidden" name="' . $comment_input_name . 'image_' . $post_id .'_cleared" id="' . $comment_input_name . 'image_' . $post_id .'_cleared" />';
+			$new_image_input .= '<input type="hidden" name="comment_image_' . $post_id . '_nonce" value="' . $comment_image_nonce_field . '" />';
+			$new_image_input .= '<a class="clear_image_upload" data-clear="comment_' . $comment_input_name . 'image_' . $post_id .'" ><i></i>Clear the image.</a>';
+			$new_image_input .= '</div>';
 
-			 echo $html;
+			 echo $new_image_input;
 
 		 } // end if
 
 	} // end add_image_upload_form
+
+
+	public function add_image_upload_fields( $submit_field, $args ){
+
+		$post_id = get_the_ID();
+
+		if( ! $post_id ){
+			return;
+		}
+		$comment_image_fields = $this->add_image_upload_form( $post_id );
+		
+		return $submit_field;
+		/// try adding it here -- this is a filter
+	}
 
 	/**
 	 * Adds the comment image upload form to the comment form.
@@ -512,6 +525,84 @@ class MJJ_Comment_Image {
 		} // end if
 
 	} // end save_comment_image
+
+/**
+	 * Handles uploading a file to a WordPress comment
+	 *
+	 * @param  int   $post_id              Post ID to upload the photo to
+	 * @param  array $attachment_post_data Attachement post-data array
+	 */
+	public function save_the_comment_image( $comment_id, $comment, $is_edit = 'no', $current_thumbnail_id = 0, $image_cleared = 'no' ) {
+
+		// So if there is a file to upload, check to see if there's an old one to delete first
+		if( $is_edit === 'yes' && $current_thumbnail_id !== 0  && $image_cleared === 'cleared' ){
+			wp_delete_attachment( (int)$current_thumbnail_id );
+		}
+
+		$post_id = $comment->comment_post_ID;
+
+		$comment_input_name = ( $comment_id && $is_edit === 'yes' ) ? $comment_id . '_' : '';
+		$comment_image_id = 'comment_' . $comment_input_name . 'image_' . $post_id;
+
+
+		// Make sure the right files were submitted
+		if (
+			empty( $_FILES )
+			|| ! isset( $_FILES[ $comment_image_id ] )
+			|| isset( $_FILES[ $comment_image_id ]['error'] ) && 0 !== $_FILES[ $comment_image_id ]['error']
+		) {
+			return false;
+		}
+
+		// Filter out empty array values
+		$files = array_filter( $_FILES[ $comment_image_id ] );
+		// Make sure files were submitted at all
+		if ( empty( $files ) ) {
+			return false;
+		}
+
+		if( !getimagesize($_FILES[ $comment_image_id ]['tmp_name']) ){
+			return new WP_Error( 'comment-error', __( 'not-an-image', 'mci' ) );
+		}
+
+		// Check filesize
+		if($_FILES[ $comment_image_id ]['size'] > 2000000 ){
+    		return new WP_Error( 'comment-error', __( 'image-too-large', 'mci' ) );
+		}
+
+		// Make sure to include the WordPress media uploader API if it's not (front-end)
+		if ( ! function_exists( 'media_handle_upload' ) ) {
+			require_once( ABSPATH . 'wp-admin/includes/image.php' );
+			require_once( ABSPATH . 'wp-admin/includes/file.php' );
+			require_once( ABSPATH . 'wp-admin/includes/media.php' );
+		}
+
+		// Let's change the filename so it doesn't accidentally give out any info.
+		// I dunno, like someone could put their address or phone number in there or full name with all their secrets, people are weird when it comes to naming things.
+		// http://stackoverflow.com/questions/3259696/rename-files-during-upload-within-wordpress-backend
+		add_filter('sanitize_file_name', function( $filename, $renamed_file ){
+			$info = pathinfo( $renamed_file );
+    		$ext  = empty( $info['extension']) ? '' : '.' . $info['extension'];
+    		$name = basename( $renamed_file , $ext ) . 'recipe_image';
+    		return substr( md5( $name ), 0, 8 ) . $ext; }, 10, 2);
+
+		// Upload the file and send back the attachment post ID
+		$comment_image_uploaded_id = media_handle_upload( $comment_image_id, $post_id );
+
+		// Set the url
+		$comment_image_file['url'] = wp_get_attachment_url( $comment_image_uploaded_id );
+		
+		// This is the image ID which we'll use in displaying it
+		$comment_image_file['comment_image_id'] = $comment_image_uploaded_id;
+		
+		// Set post meta about this image. (The $comment_image_file array)
+		if( ! is_wp_error( $comment_image_uploaded_id ) ) {
+			
+			// Since we've already added the key for this, we'll just update it with the file.
+			add_comment_meta( $comment_id, 'comment_image', $comment_image_file );
+		} // end if/else
+
+	}
 
 	/**
 	 * Appends the image below the content of the comment.

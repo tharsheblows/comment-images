@@ -10,7 +10,7 @@
  *
  * 
  * Plugin Name: MJJ Comment Images 
- * Description: Allow your readers easily to attach an image to their comments on posts and pages.
+ * Description: Branch of fork from Tom McFarlin's plugin. Customised for BSF
  * Version:     2.0
  * Author:      JJ forked from https://github.com/wp-plugins/comment-images/
  * Text Domain: comment-image-locale
