@@ -111,7 +111,7 @@ class MJJ_Comment_Image {
 			// Add the Upload input to the comment form
 			//add_action( 'comment_form' , array( $this, 'add_image_upload_form' ) );
 			add_filter( 'comment_form_submit_field', array( $this, 'add_image_upload_fields'), 10, 2 );
-			add_action( 'wp_insert_comment', array( $this, 'save_the_comment_image' ), 10, 2 );
+			add_action( 'wp_insert_comment', array( 'MJJ_Comment_Image', 'save_the_comment_image' ), 10, 2 );
 			add_filter( 'comment_text', array( $this, 'display_comment_image' ), 10, 3 );
 
 			// Add a note to recent comments that they have Comment Images
@@ -408,7 +408,7 @@ class MJJ_Comment_Image {
 	 *
 	 * @param	$post_id	The ID of the post on which the comment is being added.
 	 */
- 	private function add_image_upload_form( $post_id = false, $comment_id = false ) {
+ 	public static function add_image_upload_form( $post_id = false, $comment_id = false ) {
 
  		if( ! $post_id ){
  			$post_id = get_the_ID();
@@ -428,13 +428,15 @@ class MJJ_Comment_Image {
 			$new_image_input  = '<div class="commment-image-wrapper"><label for="comment_' . $comment_input_name . 'image_' . $post_id . '">Upload an image</label>';
 			$new_image_input .= '<input type="file" class="mjj-file-upload-box" name="comment_' . $comment_input_name . 'image_' . $post_id .'" id="comment_' . $comment_input_name . 'image_' . $post_id .'">';
 			$new_image_input .= '<input type="hidden" name="' . $comment_input_name . 'image_' . $post_id .'_cleared" id="' . $comment_input_name . 'image_' . $post_id .'_cleared" />';
-			$new_image_input .= '<input type="hidden" name="comment_image_' . $post_id . '_nonce" value="' . $comment_image_nonce_field . '" />';
+			$new_image_input .= '<input type="hidden" name="comment_image_nonce" value="' . $comment_image_nonce_field . '" />';
 			$new_image_input .= '<a class="clear_image_upload" data-clear="comment_' . $comment_input_name . 'image_' . $post_id .'" ><i></i>Clear the image.</a>';
 			$new_image_input .= '</div>';
 
-			 echo $new_image_input;
+			 return $new_image_input;
 
 		 } // end if
+
+		 return;
 
 	} // end add_image_upload_form
 
@@ -446,9 +448,10 @@ class MJJ_Comment_Image {
 		if( ! $post_id ){
 			return;
 		}
-		$comment_image_fields = $this->add_image_upload_form( $post_id );
+		$comment_image_fields = MJJ_Comment_Image::add_image_upload_form( $post_id );
+		$return_fields = $comment_image_fields . $submit_field;
 		
-		return $submit_field;
+		return $return_fields;
 		/// try adding it here -- this is a filter
 	}
 
@@ -460,11 +463,19 @@ class MJJ_Comment_Image {
 	 * @param  array $attachment_post_data Attachement post-data array
 	 *
 	 */
-	public function save_the_comment_image( $comment_id, $comment, $is_edit = 'no', $current_thumbnail_id = 0, $image_cleared = 'no' ) {
+	public static function save_the_comment_image( $comment_id, $comment, $is_edit = 'no', $current_thumbnail_id = 0 ) {
 
 		// So if there is a file to upload, check to see if there's an old one to delete first
-		if( $is_edit === 'yes' && $current_thumbnail_id !== 0  && $image_cleared === 'cleared' ){
-			wp_delete_attachment( (int)$current_thumbnail_id );
+		if( $is_edit === 'yes' && $current_thumbnail_id !== 0 ){
+			
+			$delete_attachment = wp_delete_attachment( (int)$current_thumbnail_id );
+			$delete_comment_meta = delete_comment_meta( $comment_id, 'comment_image' );
+
+			if( empty( $delete_comment_meta ) || empty( $delete_attachment ) ){
+				error_log( 'deletion went wrong', 0 );
+				return false;
+			}
+
 		}
 
 		$post_id = $comment->comment_post_ID;
@@ -479,6 +490,7 @@ class MJJ_Comment_Image {
 			|| ! isset( $_FILES[ $comment_image_id ] )
 			|| isset( $_FILES[ $comment_image_id ]['error'] ) && 0 !== $_FILES[ $comment_image_id ]['error']
 		) {
+			error_log( 'empty filtes', 0 );
 			return false;
 		}
 
@@ -486,15 +498,18 @@ class MJJ_Comment_Image {
 		$files = array_filter( $_FILES[ $comment_image_id ] );
 		// Make sure files were submitted at all
 		if ( empty( $files ) ) {
+			error_log( 'now empty filtes', 0 );
 			return false;
 		}
 
 		if( !getimagesize($_FILES[ $comment_image_id ]['tmp_name']) ){
+			error_log( 'nosize', 0 );
 			return new WP_Error( 'comment-error', __( 'not-an-image', 'mci' ) );
 		}
 
 		// Check filesize
 		if($_FILES[ $comment_image_id ]['size'] > 2000000 ){
+			error_log( 'too large', 0 );
     		return new WP_Error( 'comment-error', __( 'image-too-large', 'mci' ) );
 		}
 
@@ -539,7 +554,12 @@ class MJJ_Comment_Image {
 	 *
 	 * @param	$comment	The content of the comment.
 	 */
-	function display_comment_image( $comment_text, $comment, $args ) {
+	function display_comment_image( $comment_text, $comment = false, $args = false ) {
+
+		if( ! $comment ){
+			error_log( 'just the text', 0 );
+			return $comment_text;
+		}
 
 		$comment_id = $comment->comment_ID;
 
@@ -560,12 +580,12 @@ class MJJ_Comment_Image {
 			$img_sizes = wp_get_attachment_image_sizes( $comment_image_id, 'large' );
 
 			// ...and render it in a paragraph element appended to the comment
-			$comment_text .= '<p class="comment-image">';
+			$comment_text .= '<p class="comment-image" data-thumbnail="' . $comment_image_id . '">';
 				$comment_text .= '<img src="' . esc_url( $img_src ) . '" srcset="' . esc_attr( $img_srcset ) . '" sizes="' . esc_attr( $img_sizes ) . '" />';
-			$comment_text .= '</p>';
-
+			$comment_text .= '</p>'; 
 
 		} // end if
+
 
 		return $comment_text;
 
