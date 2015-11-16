@@ -473,23 +473,45 @@ class MJJ_Comment_Image {
 			return false;
 		}
 
+		$current_user = wp_get_current_user();
+		if( ! wp_get_current_user() ){
+			error_log( 'must be logged in to save rating', 0 );
+			return false;
+		}
+
+		$comment_author_id = $comment->user_id; // the comment author's user id
+
+		// the default is that you can add an image if you own the comment
+		$user_is_author = ( (int)$comment_author_id === (int)$current_user->ID ) ? 'yes' : 'no';
+
+		// this filter allows you to add moderators etc -- currently no one but the author can add an image with this function
+		$user_can_add_image = apply_filters( 'mjj-can-add-image', $user_is_author, $current_user );
+
+		if( $user_can_add_image !== 'yes' ){
+			error_log( 'user may not add image', 0 );
+			return false;
+		}
+
 		// So if there is a file to upload, check to see if there's an old one to delete first
 		if( $is_edit === 'yes' ){
 			
 			$get_attachment_ids = get_comment_meta( $comment_id, 'comment_image' );
 
-			foreach( $get_attachment_ids as $get_attachment_id ){
-				$attachment_id = $get_attachment_id[ 'comment_image_id' ];
-				error_log( $attachment_id, 0 );
-				wp_delete_attachment( (int)$attachment_id, true );
-			}
+			if( ! empty( $get_attachment_ids ) ){
 
-			$delete_comment_meta = delete_comment_meta( $comment_id, 'comment_image' );
-
-			if( empty( $delete_comment_meta ) ){
-				error_log( $delete_attachment . ' attachment', 0 );
-				error_log( $delete_comment_meta . ' comment meta', 0 );
-				return false;
+				foreach( $get_attachment_ids as $get_attachment_id ){
+					$attachment_id = $get_attachment_id[ 'comment_image_id' ];
+					error_log( $attachment_id, 0 );
+					wp_delete_attachment( (int)$attachment_id, true );
+				}
+	
+				$delete_comment_meta = delete_comment_meta( $comment_id, 'comment_image' );
+	
+				if( empty( $delete_comment_meta ) ){
+					error_log( $delete_attachment . ' attachment', 0 );
+					error_log( $delete_comment_meta . ' comment meta', 0 );
+					return false;
+				}
 			}
 		}
 
@@ -608,9 +630,13 @@ class MJJ_Comment_Image {
 			$comment_text .= '<img src="' . esc_url( $img_src ) . '" srcset="' . esc_attr( $img_srcset ) . '" sizes="' . esc_attr( $img_sizes ) . '" />';
 			$comment_text .= '</p>'; 
 		
+			return $comment_text;
+
 		} // end if
 
-		return $comment_text;
+		return;
+
+		
 	}
 
 	/*--------------------------------------------*
