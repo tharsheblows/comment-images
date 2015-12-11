@@ -425,7 +425,7 @@ class MJJ_Comment_Image {
 	 	// Create the label and the input field for uploading an image
 	 	if ( 'disabled' != get_option( 'comment_image_toggle_state' ) && 'disable' != get_post_meta( $post_id, 'comment_images_toggle', true ) ) {
 
-			$new_image_input  = '<div class="commment-image-wrapper"><label for="comment_' . $comment_input_name . 'image_' . $post_id . '">Upload an image</label>';
+			$new_image_input  = '<div class="comment-image-wrapper"><label for="comment_' . $comment_input_name . 'image_' . $post_id . '">Upload an image</label>';
 			$new_image_input .= '<input type="file" class="mjj-file-upload-box" name="comment_' . $comment_input_name . 'image_' . $post_id .'" id="comment_' . $comment_input_name . 'image_' . $post_id .'">';
 			$new_image_input .= '<input type="hidden" name="' . $comment_input_name . 'image_' . $post_id .'_cleared" id="' . $comment_input_name . 'image_' . $post_id .'_cleared" />';
 			$new_image_input .= '<input type="hidden" name="comment_image_nonce" value="' . $comment_image_nonce_field . '" />';
