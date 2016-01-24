@@ -14,11 +14,11 @@ jQuery( document ).ready( function ($){
 	var uploadCommentImageBackground = '/src/wp-content/themes/bloodsugarfix/images/dist/recipe-images/fork-knife-plate.png';
 
 
-	$( '.commment-image-wrapper' ).on( 'change', 'input[type="file"].mjj-file-upload-box ', function(){
+	$( '.comment-image-wrapper' ).on( 'change', 'input[type="file"].mjj-file-upload-box ', function(){
     	commentImagesDisplayPreview( this );
 	});
 
-	$( '.commment-image-wrapper' ).on( 'click', 'a.clear_image_upload', function( e ){
+	$( '.comment-image-wrapper' ).on( 'click', 'a.clear_image_upload', function( e ){
 		e.preventDefault();
     	commentImagesClearImageUpload( this );
 	});
@@ -37,7 +37,7 @@ jQuery( document ).ready( function ($){
 
 	    	    var extension = input.files[0].name.split('.').pop().toLowerCase();
 	    	    var isOK = allowedCommentImageTypes.indexOf(extension) > -1;
-	    	    var notTooBig = input.files[0].size < 2000000;
+	    	    var notTooBig = input.files[0].size < 8000000;
 
 	    	    if( isOK && notTooBig ){
 	    	    	reader.onload = function (e) {
@@ -48,7 +48,7 @@ jQuery( document ).ready( function ($){
 	    	    }
 	    	    else{
 	    	    	commentImagesClearImageUpload( clear_this );
-	    	    	alert( 'You may only uploads images of types jpg, png or gif and they must be less than 2MB.' );
+	    	    	alert( 'You may only uploads images of types jpg, png or gif and they must be less than 8MB.' );
 	    	    }
 
 	    	}

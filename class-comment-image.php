@@ -543,7 +543,7 @@ class MJJ_Comment_Image {
 		}
 
 		// Check filesize
-		if($_FILES[ $comment_image_id ]['size'] > 2000000 ){
+		if($_FILES[ $comment_image_id ]['size'] >  8000000 ){
 			error_log( 'too large', 0 );
     		return new WP_Error( 'comment-error', __( 'image-too-large', 'mci' ) );
 		}
