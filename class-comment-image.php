@@ -353,11 +353,11 @@ class MJJ_Comment_Image {
 	 */
 	function add_scripts() {
 
-		$suffix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
+		$script_path = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ?  'js/dev/comment-images.js' : 'js/comment-images.min.js'; // @todo make non minified version to use here
 
 		if( is_single() || is_page() ) {
 
-			wp_register_script( 'comment-images', plugins_url( "js/comment-images$suffix.js", __FILE__ ), array( 'jquery' ) );
+			wp_register_script( 'comment-images', plugins_url( $script_path, __FILE__ ), array( 'jquery' ) );
 
 			wp_enqueue_script( 'comment-images' );
 
